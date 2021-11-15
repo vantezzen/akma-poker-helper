@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import CurrentCardsDisplay from './components/CurrentCardsDisplay';
+import RotationInfo from './components/RotationInfo';
 import Game from './pages/Game';
 import Start from './pages/Start';
 import useStore from './store';
@@ -37,14 +38,22 @@ function App() {
     });
   }, []);
 
+  let pageContent = (<div>Invalid State: Page is unknown</div>);
   switch (page) {
     case 'start':
-      return <Start />;
+      pageContent = <Start />;
+      break;
     case 'game':
-      return <Game />;
-    default:
-      return (<div>Invalid State: Page is unknown</div>)
+      pageContent = <Game />;
+      break;
   }
+
+  return (
+    <>
+      <RotationInfo />
+      {pageContent}
+    </>
+  );
 }
 
 export default App;
