@@ -6,14 +6,11 @@ module.exports = {
       colors: {
         brand: {
           1: '#142F43',
+          '1-dark': '#0E212F',
           2: '#FFAB4C',
           3: '#FF5F7E'
         }
-      }
-    },
-  },
-  variants: {
-    extend: {
+      },
       width: {
         '1/2-screen': '50vw',
         '1/3-screen': '33vw',
@@ -29,6 +26,9 @@ module.exports = {
         '1/10-screen': '10vh',
       },
     },
+  },
+  variants: {
+    extend: {},
   },
   plugins: [],
 }
