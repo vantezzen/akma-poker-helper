@@ -1,6 +1,7 @@
 import React from "react";
 import useStore from "../store";
 import Card from "./Card";
+import CardStack from "./CardStack";
 import Section from "./Section";
 import SectionHeading from "./SectionHeading";
 
@@ -12,27 +13,27 @@ const CurrentCardsDisplay = () => {
       <Section className="col-span-5">
         <SectionHeading>On desk</SectionHeading>
 
-        <div className="grid grid-cols-5 gap-3">
+        <CardStack items={5}>
           {cards.desk.map((card, index) => (
-            <Card key={index} {...card} height={24} />
+            <Card key={index} {...card} />
           ))}
           {[...Array(5 - cards.desk.length)].map((_, index) => (
-            <Card key={index} height={24} />
+            <Card key={index} />
           ))}
-        </div>
+        </CardStack>
       </Section>
 
       <Section className="col-span-2">
         <SectionHeading>Your hand</SectionHeading>
 
-        <div className="grid grid-cols-2 gap-3">
+        <CardStack items={2}>
           {cards.hand.map((card, index) => (
-            <Card key={index} {...card} height={24} />
+            <Card key={index} {...card} />
           ))}
           {[...Array(2 - cards.hand.length)].map((_, index) => (
-            <Card key={index} height={24} />
+            <Card key={index} />
           ))}
-        </div>
+        </CardStack>
       </Section>
     </div>
   );
