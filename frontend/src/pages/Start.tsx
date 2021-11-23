@@ -9,10 +9,11 @@ function Start() {
   const numPlayers = useStore(state => state.numPlayers);
   const setPlayerCount = useStore(state => state.setPlayerCount);
   const setPage = useStore(state => state.setPage);
+  const socket = useStore(state => state.socket);
 
   let action = (
     <Button onClick={() => {
-      // TODO: Register with server
+      socket?.emit('join');
       setIsEnrolled(true);
       setPlayerCount(numPlayers + 1);
     }}>
@@ -27,10 +28,16 @@ function Start() {
         </p>
 
         <Button onClick={() => {
-          // TODO: Send to server
+          socket?.emit('start');
           setPage("game");
         }}>
           Start the round
+        </Button>
+        <Button color="red-500" className="mt-5" onClick={() => {
+          socket?.emit('leave');
+          setIsEnrolled(false);
+        }}>
+          Leave round
         </Button>
       </>
     )

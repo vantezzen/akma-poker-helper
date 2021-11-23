@@ -8,6 +8,7 @@ import useStore from '../store';
 // Page displayed during active game
 function Game() {
   const cards = useStore(state => state.cards);
+  const socket = useStore(state => state.socket);
 
   return (
     <div className="w-screen h-screen bg-brand-1 text-brand-2 font-mono grid grid-rows-3">
@@ -38,11 +39,15 @@ function Game() {
 
         <Section>
           <div className="grid grid-cols-2 gap-4">
-            <Button>
+            <Button onClick={() => {
+              socket?.emit('revert-card')
+            }}>
               Revert card
             </Button>
-            <Button>
-              Next round
+            <Button color="red-500" onClick={() => {
+              socket?.emit('stop')
+            }}>
+              Stop game
             </Button>
           </div>
         </Section>
