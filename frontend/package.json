@@ -12,8 +12,10 @@
     "@types/node": "^16.11.9",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "async-mqtt": "^2.6.1",
     "cors": "^2.8.5",
     "express": "4",
+    "mqtt": "^4.2.8",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-feather": "^2.0.9",
@@ -32,7 +34,9 @@
     "eject": "craco eject",
     "server": "ts-node --project server/tsconfig.json server/index.ts",
     "dev:server": "nodemon",
-    "dev": "concurrently \"npm:dev:server\" \"npm:start\""
+    "dev": "concurrently \"npm:dev:server\" \"npm:start\"",
+    "stub:reader": "ts-node --project server/tsconfig.json stubs/reader.stub.ts",
+    "stub:logic": "ts-node --project server/tsconfig.json stubs/logic.stub.ts"
   },
   "eslintConfig": {
     "extends": [

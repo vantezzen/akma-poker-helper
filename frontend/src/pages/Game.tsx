@@ -8,6 +8,7 @@ import useStore from '../store';
 // Page displayed during active game
 function Game() {
   const cards = useStore(state => state.cards);
+  const logic = useStore(state => state.logic);
   const socket = useStore(state => state.socket);
 
   return (
@@ -24,7 +25,7 @@ function Game() {
             You are
           </SectionHeading>
           <p className="text-3xl font-bold">
-            Big Blind
+            {logic.flags.join(', ') || 'normal player'}
           </p>
         </Section>
 
@@ -33,7 +34,7 @@ function Game() {
             Next Card
           </SectionHeading>
           <p className="text-3xl font-bold">
-            Player 3
+            {cards.nextCard === "desk" ? "On desk" : `Player ${cards.nextCard}`}
           </p>
         </Section>
 

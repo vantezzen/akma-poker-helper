@@ -15,35 +15,9 @@ function App() {
   const setSocket = useStore(state => state.setSocket);
   const setPlayerCount = useStore(state => state.setPlayerCount);
   const setPage = useStore(state => state.setPage);
+  const setLogic = useStore(state => state.setLogic);
 
   useEffect(() => {
-    setCards({
-      desk: [
-        {
-          suit: 'hearts',
-          rank: "3"
-        },
-        {
-          suit: 'spades',
-          rank: "K"
-        },
-        {
-          suit: 'diamonds',
-          rank: "10"
-        }
-      ],
-      hand: [
-        {
-          suit: 'clubs',
-          rank: 'A'
-        },
-        {
-          suit: 'clubs',
-          rank: 'K'
-        }
-      ]
-    });
-
     const socket = io(':3001');
     setSocket(socket);
     socket.on('players', (players) => {
@@ -58,6 +32,14 @@ function App() {
       } else {
         setPage('start');
       }
+    });
+    socket.on('state', (state) => {
+      console.log('Socket: Got state', state);
+      setCards(state);
+    });
+    socket.on('logic', (logic) => {
+      console.log('Socket: Got logic', logic);
+      setLogic(logic);
     });
   }, []);
 

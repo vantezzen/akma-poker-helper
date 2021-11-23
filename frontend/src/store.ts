@@ -5,6 +5,20 @@ import { CardData } from './components/Card'
 export type CardStore = {
   desk: CardData[];
   hand: CardData[];
+  nextCard: "desk" | number;
+}
+
+export type Flag = "big blind" | "small blind";
+export type Gamelogic = {
+  bestHand: {
+    name: string;
+    cards: CardData[];
+  },
+  hopeFor: {
+    name: string;
+    card: CardData;
+  },
+  flags: Flag[];
 }
 
 export type Pages = 'start' | 'game' | 'end' | 'cantjoin';
@@ -22,6 +36,9 @@ export type AppStore = {
 
   cards: CardStore;
   setCards: (cards: CardStore) => void;
+
+  logic: Gamelogic;
+  setLogic: (logic: Gamelogic) => void;
 }
 
 const useStore = create<AppStore>((set: Function) => ({
@@ -42,7 +59,22 @@ const useStore = create<AppStore>((set: Function) => ({
   cards: {
     desk: [],
     hand: [],
+    nextCard: "desk"
   },
   setCards: (cards: CardStore) => set(() => ({ cards })),
+
+  // Logic
+  logic: {
+    bestHand: {
+      name: '',
+      cards: [],
+    },
+    hopeFor: {
+      name: '',
+      card: { suit: 'clubs', rank: 'A' },
+    },
+    flags: [],
+  },
+  setLogic: (logic: Gamelogic) => set(() => ({ logic })),
 }))
 export default useStore;
