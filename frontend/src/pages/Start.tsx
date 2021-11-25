@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import Button from '../components/Button';
 import CurrentCardsDisplay from '../components/CurrentCardsDisplay';
+import GlassTapListener from '../components/GlassTapListener';
 import useStore from '../store';
 
 // Page displayed before starting a round
@@ -10,14 +12,42 @@ function Start() {
   const setPlayerCount = useStore(state => state.setPlayerCount);
   const setPage = useStore(state => state.setPage);
   const socket = useStore(state => state.socket);
+  const glassMode = useStore(state => state.mode) === "glass";
+
+  const startGame = () => {
+    socket?.emit('start');
+    setPage("game");
+  };
+  const joinGame = () => {
+    socket?.emit('join');
+    setIsEnrolled(true);
+    setPlayerCount(numPlayers + 1);
+  };
+  const leaveGame = () => {
+    socket?.emit('leave');
+    setIsEnrolled(false);
+  }
+
+  useEffect(() => {
+    const gtl = new GlassTapListener(() => {
+      if (isEnrolled) {
+        startGame();
+      } else {
+        joinGame();
+      }
+    }, () => {
+      if (isEnrolled) {
+        leaveGame();
+      }
+    });
+    gtl.setAsCurrentListener();
+  }, [setPage, isEnrolled, startGame]);
 
   let action = (
     <Button onClick={() => {
-      socket?.emit('join');
-      setIsEnrolled(true);
-      setPlayerCount(numPlayers + 1);
+      joinGame();
     }}>
-      Register as next player in the round
+      Register as next player in the round {glassMode && ' (tap)'}
     </Button>
   )
   if (isEnrolled) {
@@ -28,16 +58,14 @@ function Start() {
         </p>
 
         <Button onClick={() => {
-          socket?.emit('start');
-          setPage("game");
+          startGame();
         }}>
-          Start the round
+          Start the round {glassMode && ' (tap)'}
         </Button>
         <Button color="red-500" className="mt-5" onClick={() => {
-          socket?.emit('leave');
-          setIsEnrolled(false);
+          leaveGame();
         }}>
-          Leave round
+          Leave round {glassMode && ' (double tap)'}
         </Button>
       </>
     )

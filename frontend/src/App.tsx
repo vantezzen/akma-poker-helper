@@ -6,10 +6,13 @@ import Start from './pages/Start';
 import { io } from 'socket.io-client';
 import useStore from './store';
 import CantJoin from './pages/CantJoin';
+import GlassTap from './components/GlassTap';
+import ModeSelect from './pages/ModeSelect';
 
 function App() {
   const page = useStore(state => state.page);
   const isEnrolled = useStore(state => state.isEnrolled);
+  const mode = useStore(state => state.mode);
 
   const setCards = useStore(state => state.setCards);
   const setSocket = useStore(state => state.setSocket);
@@ -30,7 +33,7 @@ function App() {
       if (isRunning) {
         setPage(enrolled ? 'game' : 'cantjoin');
       } else {
-        setPage('start');
+        setPage(mode ? 'start' : 'modeselect');
       }
     });
     socket.on('state', (state) => {
@@ -54,10 +57,14 @@ function App() {
     case 'cantjoin':
       pageContent = <CantJoin />
       break;
+    case 'modeselect':
+      pageContent = <ModeSelect />
+      break;
   }
 
   return (
     <>
+      {mode === "glass" && <GlassTap />}
       <RotationInfo />
       {pageContent}
     </>

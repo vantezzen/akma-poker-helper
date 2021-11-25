@@ -21,10 +21,13 @@ export type Gamelogic = {
   flags: Flag[];
 }
 
-export type Pages = 'start' | 'game' | 'end' | 'cantjoin';
+export type Pages = 'start' | 'game' | 'end' | 'cantjoin' | 'modeselect';
 export type AppStore = {
   page: Pages;
   setPage: (page: Pages) => void;
+
+  setMode: (mode: string) => void;
+  mode: "normal" | "glass" | null;
 
   isEnrolled: boolean;
   setIsEnrolled: (isEnrolled: boolean) => void;
@@ -42,8 +45,11 @@ export type AppStore = {
 }
 
 const useStore = create<AppStore>((set: Function) => ({
-  page: 'start',
+  page: 'modeselect',
   setPage: (page: Pages) => set((state: AppStore) => ({ ...state, page })),
+
+  mode: null,
+  setMode: (mode: string) => set((state: AppStore) => ({ ...state, mode })),
 
   // General
   isEnrolled: false,

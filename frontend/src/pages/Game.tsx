@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import Button from '../components/Button';
 import CurrentCardsDisplay from '../components/CurrentCardsDisplay';
+import GlassTapListener from '../components/GlassTapListener';
 import HandsInfo from '../components/HandsInfo';
 import Section from '../components/Section';
 import SectionHeading from '../components/SectionHeading';
@@ -10,6 +12,16 @@ function Game() {
   const cards = useStore(state => state.cards);
   const logic = useStore(state => state.logic);
   const socket = useStore(state => state.socket);
+  const glassMode = useStore(state => state.mode) === "glass";
+
+  useEffect(() => {
+    const gtl = new GlassTapListener(() => {
+      socket?.emit('revert-card')
+    }, () => {
+      socket?.emit('stop')
+    });
+    gtl.setAsCurrentListener();
+  }, [socket]);
 
   return (
     <div className="w-screen h-screen bg-brand-1 text-brand-2 font-mono grid grid-rows-3">
@@ -24,7 +36,7 @@ function Game() {
           <SectionHeading>
             You are
           </SectionHeading>
-          <p className="text-3xl font-bold">
+          <p className="text-xl font-bold">
             {logic.flags.join(', ') || 'normal player'}
           </p>
         </Section>
@@ -33,7 +45,7 @@ function Game() {
           <SectionHeading>
             Next Card
           </SectionHeading>
-          <p className="text-3xl font-bold">
+          <p className="text-xl font-bold">
             {cards.nextCard === "desk" ? "On desk" : `Player ${cards.nextCard}`}
           </p>
         </Section>
@@ -43,12 +55,12 @@ function Game() {
             <Button onClick={() => {
               socket?.emit('revert-card')
             }}>
-              Revert card
+              Revert card {glassMode && ' (tap)'}
             </Button>
             <Button color="red-500" onClick={() => {
               socket?.emit('stop')
             }}>
-              Stop game
+              Stop game {glassMode && ' (double tap)'}
             </Button>
           </div>
         </Section>

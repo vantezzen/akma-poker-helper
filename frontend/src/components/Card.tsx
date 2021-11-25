@@ -15,14 +15,15 @@ const suits = {
 };
 
 const Card = ({ suit, rank, className } : { suit?: CardSuit, rank?: CardRank, className?: string }) => {
+  const suitLower = suit?.toLowerCase();
   return (
     <div 
       className={`h-full rounded text-brand-1 flex items-center justify-center text-xl font-black ` + (suit && rank ? " bg-brand-2 ": " bg-brand-1-dark ") + className}
     >
       {suit && rank ? (
         <>
-          <span className={ suit === "hearts" || suit === "diamonds" ? 'text-red-800' : '' }>
-            {suits[suit]}
+          <span className={ suitLower === "hearts" || suitLower === "diamonds" ? 'text-red-800' : '' }>
+            {suits[suitLower as keyof typeof suits]}
           </span>
           {rank}
         </>

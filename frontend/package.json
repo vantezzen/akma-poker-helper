@@ -34,6 +34,7 @@
     "eject": "craco eject",
     "server": "ts-node --project server/tsconfig.json server/index.ts",
     "dev:server": "nodemon",
+    "dev:ngrok": "ngrok http 3000",
     "dev": "concurrently \"npm:dev:server\" \"npm:start\"",
     "stub:reader": "ts-node --project server/tsconfig.json stubs/reader.stub.ts",
     "stub:logic": "ts-node --project server/tsconfig.json stubs/logic.stub.ts"
@@ -60,6 +61,7 @@
     "@types/express": "^4.17.13",
     "autoprefixer": "^9",
     "concurrently": "^6.4.0",
+    "ngrok": "^4.2.2",
     "nodemon": "^2.0.15",
     "postcss": "^7",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat"
