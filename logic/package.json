@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "async-mqtt": "^2.6.1",
+    "bidirectional-map": "^1.1.1",
     "poker-odds-calc": "^0.0.14",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
