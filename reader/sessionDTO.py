@@ -1,5 +1,5 @@
 from typing import List, TypedDict, Mapping
-from card import Card
+from Card import Card
 
 
 class SessionDTO(TypedDict):
