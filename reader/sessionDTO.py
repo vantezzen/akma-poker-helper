@@ -6,3 +6,5 @@ class SessionDTO(TypedDict):
     desk: List[Card]
     hands: Mapping[str, List[Card]]
     nextCard: int
+    smallBlind: int
+    bigBlind: int

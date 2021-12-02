@@ -6,14 +6,16 @@ from sessionDTO import SessionDTO
 
 
 class SessionManager:
-    def __init__(self, mqtt_publisher: MqttPublisherState):
+    def __init__(self, mqtt_publisher_state: MqttPublisherState):
         self.playerAmount: int = 1
         self.__currentSession: SessionDTO = {
             "desk": [],
             "hands": {},
-            "nextCard": 0
+            "nextCard": 0,
+            "smallBlind": 1,
+            "bigBlind": 2
         }
-        self.__mqtt_publisher = mqtt_publisher
+        self.__mqtt_publisher = mqtt_publisher_state
         self.__cardAgenda: List[int] = self.__compute_agenda()
         self.__cardAgendaIndex: int = 0
         self.start_round(1)
@@ -63,11 +65,22 @@ class SessionManager:
         self.__mqtt_publisher.write_state(self.__currentSession)
 
     def start_round(self, player_amount: int):
-        self.__currentSession: SessionDTO = {
-            "desk": [],
-            "hands": {},
-            "nextCard": 0
-        }
+        if self.playerAmount != player_amount:
+            self.__currentSession: SessionDTO = {
+                "desk": [],
+                "hands": {},
+                "nextCard": 0,
+                "smallBlind": 1,
+                "bigBlind": 2
+            }
+        else:
+            self.__currentSession: SessionDTO = {
+                "desk": [],
+                "hands": {},
+                "nextCard": 0,
+                "smallBlind": (self.__currentSession["smallBlind"] % self.playerAmount) + 1,
+                "bigBlind": (self.__currentSession["bigBlind"] % self.playerAmount) + 1
+            }
         self.playerAmount: int = player_amount
 
         self.__on_update()

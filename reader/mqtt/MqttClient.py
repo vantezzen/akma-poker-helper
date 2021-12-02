@@ -7,8 +7,9 @@ class MqttClient:
         self.__host = host
         self.__client = Client()
 
-    def _connect(self):
-        self.__client.connect(self.__host, self.__port, 60)
-
     def get_client(self):
         return self.__client
+
+    def connect_and_wait(self):
+        self.__client.connect(self.__host, self.__port, 60)
+        self.get_client().loop_forever(60)
