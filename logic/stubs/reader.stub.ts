@@ -9,36 +9,41 @@ const sendTestData = async () => {
 		await mqtt.publish("akma/poker/state", JSON.stringify({
       desk: [
         {
-          suit: 'clubs',
+          suit: 'diamonds',
           rank: 'A',
         },
         {
-          suit: 'diamonds',
+          suit: 'spades',
           rank: '10',
         },
         {
           suit: 'hearts',
           rank: '5',
         },
-        {
-          suit: 'spades',
-          rank: 'K',
-        },
       ],
-      hand: {
-        // Karten in der Hand von Player 1
-        1: [
-          {
-            suit: 'hearts',
-            rank: 'A',
-          },
+      hands: {
+        "1": [
           {
             suit: 'spades',
             rank: 'A',
+          },
+          {
+            suit: 'clubs',
+            rank: 'A',
+          }
+        ],
+        "2": [
+          {
+            suit: 'diamonds',
+            rank: '4',
+          },
+          {
+            suit: 'diamonds',
+            rank: '3',
           }
         ],
       },
-      nextCard: "desk"
+      nextCard: -1 //-1 keine mehr, 0 desk, 1-16 player
     },));
 		await mqtt.end();
 		console.log("Done");
