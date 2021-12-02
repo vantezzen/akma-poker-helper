@@ -2,6 +2,7 @@ import { TexasHoldem, SixPlusHoldem, Omaha } from "poker-odds-calc";
 import MQTT from "async-mqtt";
 import { MqttPayloadConverter } from "./MqttPayloadConverter";
 import { AkmaMqttPokerObject } from "../src/akmaMqttPokerObject";
+import Result from "poker-odds-calc/dts/lib/Result";
 
 console.log("AKMA running");
 
@@ -43,7 +44,7 @@ mqtt.on("message", function (topic, payload) {
 
     //console.log(`received message: ${topic} ${payload}`)
   }
-  testBoard();
+  main();
 });
 
 function setHand(playerIndex: number, currentHand: any) {
@@ -60,45 +61,14 @@ function convertMqttCardToAkmaCard(card: any, index: number): any {
   );
 }
 
-function pokerScore() {
+function pokerScore(result: Result) {
   const Table = new TexasHoldem();
   Table.setBoard(akmaBoard);
   akmaHands.forEach((player) => Table.addPlayer(player));
 
   const Result = Table.calculate();
 
-  let players = Result.getPlayers();
-  let ranks = Object.keys(players[0].getRanks());
-  ranks.forEach((rank) => {
-    let str = "";
-    players.forEach((player, i) => {
-      if (player.getRanks()[rank].getCount() > 0)
-        str +=
-          "               " +
-          player.getRanks()[rank].getCount() +
-          " (" +
-          player.getRanks()[rank].getPercentage(true) +
-          ")";
-      else str += "               _";
-    });
-    console.log(str);
-  });
-
-  Result.getPlayers().forEach((player) => {
-    console.log(
-      `${player.getName()} - ${player.getHand()} - Wins: ${player.getWinsPercentageString()} - Ties: ${player.getTiesPercentageString()}`
-    );
-  });
-}
-
-function testBoard() {
-  const Table = new TexasHoldem();
-  Table.setBoard(akmaBoard);
-  akmaHands.forEach((value) => Table.addPlayer(value));
-
-  const Result = Table.calculate();
-
-  let players = Result.getPlayers();
+  let players = result.getPlayers();
   let ranks = Object.keys(players[0].getRanks());
   let iterations = Result.getIterations();
   let currentRank = 42;
@@ -109,32 +79,35 @@ function testBoard() {
   console.log("Total Iterations: " + iterations);
   console.log("Ranks:");
   players.forEach((player) => {
-    console.log(`Player: ${player.getName()}: `),
-      (totalScore = 0),
-      (currentRank = 0);
+    console.log(`${player.getName()}: `), (totalScore = 0), (currentRank = 0);
     ranks.forEach((rank) => {
-      (percentage = (player.getRanks()[rank].getCount() / iterations) * 10),
-        (partialScore = (10 - currentRank) * percentage),
+      (percentage = player.getRanks()[rank].getCount() / iterations),
+        (partialScore = (10 - currentRank) * percentage * 10),
         console.log(
-          `Rank: ${10 - currentRank} - RankName: ${player
+          `Rank: ${10 - currentRank} - ${player
             .getRanks()
-            [rank].getName()} - Percentage: ${player
+            [rank].getName()} - %: ${player
             .getRanks()
-            [
-              rank
-            ].getCount()}/${iterations} = ${percentage} - PartialScore: ${partialScore}`
+            [rank].getCount()}/${iterations} = ${Math.round(percentage * 100)} - Score: ${Math.round(partialScore)}`
         );
       totalScore += partialScore;
       currentRank++;
     });
-    console.log("Score for " + player.getName() + ": " + totalScore);
+    console.log(
+      "TotalScore for " + player.getName() + ": " + Math.round(totalScore)
+    );
   });
+}
+
+function testBoard(result: Result) {
+  let players = result.getPlayers();
+  let ranks = Object.keys(players[0].getRanks());
   // console.log(`Board: ${Result.getBoard()}`);
 
   ranks.forEach((rank) => {
     //let str = players[0].getRanks()[rank].getName();
     let str = "";
-    players.forEach((player, i) => {
+    players.forEach((player) => {
       if (player.getRanks()[rank].getCount() > 0)
         str +=
           "               " +
@@ -147,14 +120,14 @@ function testBoard() {
     console.log(str);
   });
 
-  Result.getPlayers().forEach((player) => {
+  result.getPlayers().forEach((player) => {
     console.log(
       `${player.getName()} - ${player.getHand()} - Wins: ${player.getWinsPercentageString()} - Ties: ${player.getTiesPercentageString()}`
     );
   });
 
-  console.log(`Iterations: ${Result.getIterations()}`);
-  console.log(`Time takes: ${Result.getTime()}ms`);
+  console.log(`Iterations: ${result.getIterations()}`);
+  console.log(`Time takes: ${result.getTime()}ms`);
 
   // Outputs:
   // Player #1 - QsKs - Wins: 20.45% - Ties: 79.55%
@@ -162,4 +135,14 @@ function testBoard() {
   // Board: JsTs5hTd
   // Iterations: 44
   // Time takes: 8ms
+}
+function main() {
+  const Table = new TexasHoldem();
+  Table.setBoard(akmaBoard);
+  akmaHands.forEach((value) => Table.addPlayer(value));
+
+  const TableResult = Table.calculate();
+
+  pokerScore(TableResult);
+  testBoard(TableResult);
 }
