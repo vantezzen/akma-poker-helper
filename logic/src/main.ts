@@ -1,8 +1,8 @@
-import { TexasHoldem, SixPlusHoldem, Omaha } from "poker-odds-calc";
+import { TexasHoldem } from "poker-odds-calc";
 import MQTT from "async-mqtt";
 import { MqttPayloadConverter } from "./MqttPayloadConverter";
-import { AkmaMqttPokerObject } from "../src/akmaMqttPokerObject";
-import { akmaLogicObject } from "../src/akmaLogicObject";
+import { AkmaMqttPokerObject } from "./AkmaMqttPokerObject";
+import { AkmaLogicObject } from "./AkmaLogicObject";
 import Result from "poker-odds-calc/dts/lib/Result";
 
 console.log("AKMA starting...");
@@ -11,7 +11,7 @@ const mqtt = MQTT.connect("mqtt://test.mosquitto.org");
 const payloadConverter = new MqttPayloadConverter();
 
 let pokerObject: AkmaMqttPokerObject;
-let LogicObject: akmaLogicObject;
+let logicObject: AkmaLogicObject = { player: [] };
 let akmaBoard: Array<string> = [];
 const akmaHands = new Map();
 
@@ -61,13 +61,26 @@ function main() {
 
   const TableResult = Table.calculate();
 
-  pokerScore(TableResult);
-  bestPossibleHand(TableResult);
-  testBoard(TableResult);
-  pokerScoreConsole(TableResult);
-  bestPossibleHandConsole(TableResult);
-  testBoardConsole(TableResult);
+  fillLogicObject(TableResult);
+  // pokerScoreConsole(TableResult);
+  // bestPossibleHandConsole(TableResult);
+  // testBoardConsole(TableResult);
   //TODO send Winner if WinsPercentage is 100%
+
+  console.log("logicObject:");
+  console.log(logicObject);
+}
+
+function fillLogicObject(TableResult: Result) {
+  const Ranks = Object.keys(TableResult.getPlayers()[0].getRanks());
+  TableResult.getPlayers().forEach((player) =>
+    logicObject.player.push({
+      name: player.getName(),
+      ranks: [],
+      pokerScore: addPokerScore(TableResult, player.getName(), Ranks),
+      isWinner: player.isWinner(),
+    })
+  );
 }
 
 function setHand(playerIndex: number, currentHand: any) {
@@ -84,38 +97,27 @@ function convertMqttCardToAkmaCard(card: any, index: number): any {
   );
 }
 
-function pokerScore(result: Result) {
-  let players = result.getPlayers();
-  let ranks = Object.keys(players[0].getRanks());
-  let iterations = result.getIterations();
+function addPokerScore(
+  result: Result,
+  playerName: string,
+  ranks: string[]
+): number {
+  let player = result
+    .getPlayers()
+    .find((player) => player.getName() == playerName);
   let currentRank = 42;
   let totalScore = 0;
   let partialScore = 0;
   let percentage = 0;
 
-  console.log("Total Iterations: " + iterations);
-  console.log("Ranks:");
-  players.forEach((player) => {
-    console.log(`${player.getName()}: `), (totalScore = 0), (currentRank = 0);
-    ranks.forEach((rank) => {
-      (percentage = player.getRanks()[rank].getCount() / iterations),
-        (partialScore = (10 - currentRank) * percentage * 10),
-        console.log(
-          `Rank: ${10 - currentRank} - ${player
-            .getRanks()
-            [rank].getName()} - %: ${player
-            .getRanks()
-            [rank].getCount()}/${iterations} = ${Math.round(
-            percentage * 100
-          )} - Score: ${Math.round(partialScore)}`
-        );
-      totalScore += partialScore;
-      currentRank++;
-    });
-    console.log(
-      "TotalScore for " + player.getName() + ": " + Math.round(totalScore)
-    );
+  ranks.forEach((rank) => {
+    (percentage = player!.getRanks()[rank].getCount() / result.getIterations()),
+      (partialScore = (10 - currentRank) * percentage * 10),
+      (totalScore += partialScore);
+    currentRank++;
   });
+
+  return totalScore;
 }
 
 function pokerScoreConsole(result: Result) {
@@ -152,7 +154,7 @@ function pokerScoreConsole(result: Result) {
   });
 }
 
-function testBoard(result: Result) {
+function checkForVictory(result: Result) {
   let players = result.getPlayers();
   let ranks = Object.keys(players[0].getRanks());
   // console.log(`Board: ${Result.getBoard()}`);
@@ -228,7 +230,7 @@ function testBoardConsole(result: Result) {
   // Time takes: 8ms
 }
 
-function bestPossibleHand(result: Result) {
+function addRanks(result: Result) {
   let players = result.getPlayers();
   let ranks = Object.keys(players[0].getRanks());
   let iterations = result.getIterations();
