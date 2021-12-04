@@ -26,18 +26,18 @@ function Game() {
   return (
     <div className="w-screen h-screen bg-brand-1 text-brand-2 font-mono grid grid-rows-3">
 
-      <CurrentCardsDisplay />
+      {/* <CurrentCardsDisplay /> */}
 
       <HandsInfo />
 
-      <div className="border-t-4 border-solid border-brand-1-dark grid grid-cols-3 gap-1 bg-brand-1-dark">
+      <div className="border-t-4 border-solid border-brand-1-dark grid grid-cols-3 gap-1 bg-brand-1-dark z-10">
       
         <Section>
           <SectionHeading>
             You are
           </SectionHeading>
-          <p className="text-xl font-bold">
-            {logic.flags.join(', ') || 'normal player'}
+          <p className="text-3xl font-bold">
+            {logic.name}
           </p>
         </Section>
 
@@ -45,7 +45,7 @@ function Game() {
           <SectionHeading>
             Next Card
           </SectionHeading>
-          <p className="text-xl font-bold">
+          <p className="text-3xl font-bold">
             {cards.nextCard === "desk" ? "On desk" : `Player ${cards.nextCard}`}
           </p>
         </Section>

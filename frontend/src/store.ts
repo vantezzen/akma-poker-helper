@@ -10,15 +10,13 @@ export type CardStore = {
 
 export type Flag = "big blind" | "small blind";
 export type Gamelogic = {
-  bestHand: {
+  ranks: {
     name: string;
-    cards: CardData[];
-  },
-  hopeFor: {
-    name: string;
-    card: CardData;
-  },
-  flags: Flag[];
+    percentage: number;
+  }[],
+  pokerScore: number;
+  isWinner: boolean;
+  name: string;
 }
 
 export type Pages = 'start' | 'game' | 'end' | 'cantjoin' | 'modeselect';
@@ -71,15 +69,10 @@ const useStore = create<AppStore>((set: Function) => ({
 
   // Logic
   logic: {
-    bestHand: {
-      name: '',
-      cards: [],
-    },
-    hopeFor: {
-      name: '',
-      card: { suit: 'clubs', rank: 'A' },
-    },
-    flags: [],
+    ranks: [],
+    pokerScore: 0,
+    isWinner: false,
+    name: ""
   },
   setLogic: (logic: Gamelogic) => set(() => ({ logic })),
 }))

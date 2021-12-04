@@ -32,9 +32,10 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
+    "ngrok": "ngrok",
     "server": "ts-node --project server/tsconfig.json server/index.ts",
     "dev:server": "nodemon",
-    "dev:ngrok": "ngrok http 3000",
+    "dev:ngrok": "ngrok http --region=us --hostname=vantezzen.ngrok.io 3001",
     "dev": "concurrently \"npm:dev:server\" \"npm:start\"",
     "stub:reader": "ts-node --project server/tsconfig.json stubs/reader.stub.ts",
     "stub:logic": "ts-node --project server/tsconfig.json stubs/logic.stub.ts"

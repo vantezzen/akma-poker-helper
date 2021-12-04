@@ -12,9 +12,8 @@ const game = new Game();
 
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('<h1>Works</h1>');
-});
+// React Frontend
+app.use(express.static(__dirname + '/../build'));
 
 let allSockets: Socket[] = [];
 const broadcast = (event: string, data: any) => {
@@ -78,8 +77,6 @@ mqtt.on("message", function (topic, payload) {
     console.log(`received message: ${topic} ${payload}`);
     
     if (topic.endsWith('/state')) {
-      // TODO: Split to players so not every player receives all data
-
       const state = JSON.parse(payload.toString());
       console.log('Got state', state);
 
@@ -94,11 +91,7 @@ mqtt.on("message", function (topic, payload) {
       const logic = JSON.parse(payload.toString());
       console.log('Got logic', logic);
       for (let i = 0; i < game.players.length; i++) {
-        game.players[i].emit('logic', {
-          bestHand: logic.bestHand[String(i + 1)] || { name: '', cards: [] },
-          hopeFor: logic.hopeFor[String(i + 1)] || { name: '', card: { suit: 'clubs', rank: 'A' } },
-          flags: logic.flags[String(i + 1)] || [],
-        });
+        game.players[i].emit('logic', logic.player[i]);
       }
     }
   }

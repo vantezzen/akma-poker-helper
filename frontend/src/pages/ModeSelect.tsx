@@ -6,8 +6,13 @@ import useStore from '../store';
 
 // Page displayed before starting a round
 function ModeSelect() {
+  const mode = useStore(state => state.mode);
   const setMode = useStore(state => state.setMode);
   const setPage = useStore(state => state.setPage);
+
+  if (mode !== null) {
+    setPage('start');
+  }
 
   return (
     <div className="w-screen h-screen bg-brand-1 text-brand-2 font-bold font-mono grid grid-cols-2 gap-1">
