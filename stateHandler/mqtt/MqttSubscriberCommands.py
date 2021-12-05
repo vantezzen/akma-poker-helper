@@ -22,7 +22,7 @@ class MqttSubscriberCommands(MqttSubscriber):
             self.__sessionManager.revert_last()
             print()
         elif msg.topic == MqttSubscriberCommands.topics[1]:
-            self.__sessionManager.start_round(json.load(msg.payload))
+            self.__sessionManager.start_round(json.loads(msg.payload))
             print()
         elif msg.topic == MqttSubscriberCommands.topics[2]:
             print()

@@ -5,7 +5,7 @@ from mqtt.MqttPublisherState import MqttPublisherState
 from mqtt.MqttSubscriberCards import MqttSubscriberCards
 from mqtt.MqttSubscriberCommands import MqttSubscriberCommands
 
-mqttHost = "test.mosquitto.org"
+mqttHost = "broker.hivemq.com"
 mqttPublisherState = MqttPublisherState(mqttHost)
 sessionManager = SessionManager(mqttPublisherState)
 

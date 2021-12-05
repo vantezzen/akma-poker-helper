@@ -3,7 +3,7 @@ import threading
 from Card import Card
 from mqtt.MqttPublisherCard import MqttPublisherCard
 
-mqttHost = "test.mosquitto.org"
+mqttHost = "broker.hivemq.com"
 mqttPublisherState = MqttPublisherCard(mqttHost)
 
 
