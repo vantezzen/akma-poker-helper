@@ -28,6 +28,7 @@ io.on('connection', (socket) => {
   socket.on('join', () => {
     game.players.push(socket);
 
+    socket.emit('playerNum', game.players.length);
     broadcast('players', game.players.length);
   });
   socket.on('leave', () => {
@@ -53,6 +54,10 @@ io.on('connection', (socket) => {
   socket.on('revert-card', () => {
     console.log('reverting card');
     mqtt.publish('akma/poker/command/revertLast', "");
+  });
+  socket.on('fold', () => {
+    console.log('folding player');
+    mqtt.publish('akma/poker/command/fold', (game.players.findIndex(player => player === socket) + 1).toString());
   });
 
   socket.emit('players', game.players.length);

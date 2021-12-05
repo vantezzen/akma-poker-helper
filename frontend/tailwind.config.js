@@ -5,6 +5,7 @@ module.exports = {
       'bg-red-500',
       "grid-cols-5",
       "grid-cols-2",
+      "grid-cols-3",
     ]
   },
   darkMode: false, // or 'media' or 'class'

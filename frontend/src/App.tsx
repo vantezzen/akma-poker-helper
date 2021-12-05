@@ -19,6 +19,8 @@ function App() {
   const setPlayerCount = useStore(state => state.setPlayerCount);
   const setPage = useStore(state => state.setPage);
   const setLogic = useStore(state => state.setLogic);
+  const setPlayerNumber = useStore(state => state.setPlayerNumber);
+  const setHasFolded = useStore(state => state.setHasFolded);
 
   useEffect(() => {
     const socket = io();
@@ -37,6 +39,7 @@ function App() {
           ranks: [],
           pokerScore: 0,
           isWinner: false,
+          isTied: false,
           name: ""
         })
         setCards({
@@ -44,6 +47,7 @@ function App() {
           hand: [],
           nextCard: ""
         })
+        setHasFolded(false);
         setPage(mode ? 'start' : 'modeselect');
       }
     });
@@ -55,6 +59,9 @@ function App() {
       console.log('Socket: Got logic', logic);
       setLogic(logic);
     });
+    socket.on('playerNum', (num) => {
+      setPlayerNumber(num);
+    })
   }, []);
 
   let pageContent = (<div>Invalid State: Page is unknown</div>);

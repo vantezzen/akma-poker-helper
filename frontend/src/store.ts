@@ -16,6 +16,7 @@ export type Gamelogic = {
   }[],
   pokerScore: number;
   isWinner: boolean;
+  isTied: boolean;
   name: string;
 }
 
@@ -31,6 +32,12 @@ export type AppStore = {
   setIsEnrolled: (isEnrolled: boolean) => void;
   numPlayers: number;
   setPlayerCount: (numPlayers: number) => void;
+
+  playerNumber: number;
+  setPlayerNumber: (playerNumber: number) => void;
+
+  hasFolded: boolean;
+  setHasFolded: (hasFolded: boolean) => void;
 
   socket: Socket | null;
   setSocket: (socket: Socket) => void;
@@ -55,6 +62,12 @@ const useStore = create<AppStore>((set: Function) => ({
   numPlayers: 0,
   setPlayerCount: (numPlayers: number) => set((state: AppStore) => ({ ...state, numPlayers })),
 
+  playerNumber: 0,
+  setPlayerNumber: (playerNumber: number) => set((state: AppStore) => ({ ...state, playerNumber })),
+
+  hasFolded: false,
+  setHasFolded: (hasFolded: boolean) => set((state: AppStore) => ({ ...state, hasFolded })),
+
   // Socket.io client
   socket: null,
   setSocket: (socket: Socket) => set((state: AppStore) => ({ ...state, socket })),
@@ -72,6 +85,7 @@ const useStore = create<AppStore>((set: Function) => ({
     ranks: [],
     pokerScore: 0,
     isWinner: false,
+    isTied: false,
     name: ""
   },
   setLogic: (logic: Gamelogic) => set(() => ({ logic })),

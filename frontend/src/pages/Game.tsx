@@ -9,6 +9,7 @@ import useStore from '../store';
 
 // Page displayed during active game
 function Game() {
+  const state = useStore();
   const cards = useStore(state => state.cards);
   const logic = useStore(state => state.logic);
   const socket = useStore(state => state.socket);
@@ -22,6 +23,21 @@ function Game() {
     });
     gtl.setAsCurrentListener();
   }, [socket]);
+
+  let currentState = "";
+  if (cards.nextCard === -1) {
+    if (logic.isWinner) {
+      currentState = "Winner";
+    } else if (logic.isTied) {
+      currentState = "Tied";
+    } else {
+      currentState = "Loser";
+    }
+  } else if (state.hasFolded) {
+    currentState = "Folded";
+  } else {
+    currentState = "Player #" + state.playerNumber;
+  }
 
   return (
     <div className="w-screen h-screen bg-brand-1 text-brand-2 font-mono grid grid-rows-4">
@@ -37,21 +53,13 @@ function Game() {
             You are
           </SectionHeading>
           <p className="text-3xl font-bold">
-            {cards.nextCard === -1 ? (
-              <span>
-                {logic.isWinner ? 'Winner' : 'Loser haha lol'}
-              </span>
-            ) : (
-              <span>
-                {logic.name}
-              </span>
-            )}
+            {currentState}
           </p>
         </Section>
 
         <Section>
           <SectionHeading>
-            Pokerscore ™️©(Patented by Daniel Spannbauer Inc. GmbH Ltd. Ltd.)
+            Pokerscore
           </SectionHeading>
           <p className="text-3xl font-bold">
             {Math.round(logic.pokerScore)}
@@ -68,7 +76,13 @@ function Game() {
         </Section>
 
         <Section>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            <Button onClick={() => {
+              socket?.emit('fold')
+              state.setHasFolded(true)
+            }}>
+              Fold
+            </Button>
             <Button onClick={() => {
               socket?.emit('revert-card')
             }}>
