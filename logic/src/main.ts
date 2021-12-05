@@ -1,13 +1,14 @@
 import { TexasHoldem } from "poker-odds-calc";
 import MQTT from "async-mqtt";
 import { MqttPayloadConverter } from "./MqttPayloadConverter";
-import { AkmaMqttPokerObject } from "./AkmaMqttPokerObject";
+import { AkmaMqttPokerObject, Card } from "./AkmaMqttPokerObject";
 import { AkmaLogicObject, Rank } from "./AkmaLogicObject";
 import Result from "poker-odds-calc/dts/lib/Result";
 
 console.log("AKMA starting...");
+const mqttAdress: string = "mqtt://broker.hivemq.com";
 
-const mqtt = MQTT.connect("mqtt://test.mosquitto.org");
+const mqtt = MQTT.connect(mqttAdress);
 const payloadConverter = new MqttPayloadConverter();
 
 let pokerObject: AkmaMqttPokerObject;
@@ -27,30 +28,31 @@ mqtt.on("message", function (topic, payload) {
     // console.log("");
     // console.log("PokerObj.stringify(): ");
     // console.log(JSON.stringify(pokerObj, null, 2));
-
-    for (let index = 0; index < pokerObject.desk.length; index++) {
-      akmaBoard[index] = convertMqttCardToAkmaCard(pokerObject.desk, index);
-    }
-    // console.log("AKMA Board:");
-    // console.log(akmaBoard);
-
-    const player = Object.values(pokerObject.hands);
-
-    for (let playerIndex = 0; playerIndex < player.length; playerIndex++) {
-      let currentHand = player[playerIndex];
-      if (currentHand != undefined) {
-        setHand(playerIndex, currentHand);
+    if (pokerObject.desk.length >= 3 && pokerObject.desk.length <= 5) {
+      logicObject.player = [];
+      akmaBoard = [];
+      for (let index = 0; index < pokerObject.desk.length; index++) {
+        akmaBoard[index] = convertMqttCardToAkmaCard(pokerObject.desk, index);
       }
-    }
-    // console.log("AKMA Hands:");
-    // console.log(akmaHands);
+      // console.log("AKMA Board:");
+      // console.log(akmaBoard);
 
-    //console.log(`received message: ${topic} ${payload}`)
-  }
-  if (akmaBoard.length >= 3 && akmaBoard.length <= 5) {
-    main();
-  } else {
-    console.log("Wrong number of Boardcards!");
+      const player = Object.values(pokerObject.hands);
+
+      for (let playerIndex = 0; playerIndex < player.length; playerIndex++) {
+        let currentHand = player[playerIndex];
+        if (currentHand != undefined) {
+          setHand(playerIndex, currentHand);
+        }
+      }
+      // console.log("AKMA Hands:");
+      // console.log(akmaHands);
+
+      //console.log(`received message: ${topic} ${payload}`)
+      main();
+    } else {
+      console.log("Wrong number of Boardcards!");
+    }
   }
 });
 
@@ -63,9 +65,9 @@ function main() {
 
   if (TableResult.getPlayers().length > 0) {
     fillLogicObject(TableResult);
-    // pokerScoreConsole(TableResult);
-    // bestPossibleHandConsole(TableResult);
-    // testBoardConsole(TableResult);
+    pokerScoreConsole(TableResult);
+    bestPossibleHandConsole(TableResult);
+    testBoardConsole(TableResult);
 
     console.log("logicObject:");
     console.log(logicObject);
@@ -97,7 +99,10 @@ function setHand(playerIndex: number, currentHand: any) {
   ]);
 }
 
-function convertMqttCardToAkmaCard(card: any, index: number): any {
+function convertMqttCardToAkmaCard(card: Card[], index: number): any {
+  console.log("card");
+  console.log(card[index]);
+
   return payloadConverter.convertMqttCardToAkma(
     card[index].suit,
     card[index].rank
@@ -156,24 +161,19 @@ function checkForVictory(result: Result, playerName: string): boolean {
     .getPlayers()
     .find((player) => player.getName() == playerName);
 
-  return player!.getWinsPercentage() == 1;
+  return player!.getWinsPercentage() == 100;
 }
 
-function sendLogicObject(logicObjectToSend: AkmaLogicObject) {
-  const dataToSend = async () => {
-    console.log("Starting");
-    try {
-      await mqtt.publish("akma/poker/logic", JSON.stringify(logicObjectToSend));
-      await mqtt.end();
-      console.log("Done");
-    } catch (e: any) {
-      // Do something about it!
-      console.log(e.stack);
-      process.exit();
-    }
-  };
-
-  mqtt.on("connect", dataToSend);
+async function sendLogicObject(logicObjectToSend: AkmaLogicObject) {
+  console.log("Starting");
+  try {
+    await mqtt.publish("akma/poker/logic", JSON.stringify(logicObjectToSend));
+    console.log("Done");
+  } catch (e: any) {
+    // Do something about it!
+    console.log(e.stack);
+    process.exit();
+  }
 }
 
 function testBoardConsole(result: Result) {
@@ -187,12 +187,12 @@ function testBoardConsole(result: Result) {
     players.forEach((player) => {
       if (player.getRanks()[rank].getCount() > 0)
         str +=
-          "               " +
+          "   " +
           player.getRanks()[rank].getCount() +
           " (" +
           player.getRanks()[rank].getPercentage(true) +
           ")";
-      else str += "               _";
+      else str += " - ";
     });
     console.log(str);
   });

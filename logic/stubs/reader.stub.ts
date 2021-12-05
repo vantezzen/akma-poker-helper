@@ -1,6 +1,7 @@
 import MQTT from "async-mqtt";
 
-const mqtt = MQTT.connect("mqtt://test.mosquitto.org");
+const mqttAdress: string = "mqtt://broker.hivemq.com";
+const mqtt = MQTT.connect(mqttAdress);
 
 const sendTestData = async () => {
   console.log("Starting");
