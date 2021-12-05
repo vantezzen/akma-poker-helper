@@ -45,7 +45,7 @@ class SessionManager:
     def __compute_agenda(self) -> List[int]:
         agenda: List[int] = []
 
-        for i in range(1, self.playerAmount):
+        for i in range(1, self.playerAmount + 1):
             agenda.append(i)
             agenda.append(i)
 

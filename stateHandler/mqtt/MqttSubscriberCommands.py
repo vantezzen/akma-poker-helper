@@ -14,9 +14,10 @@ class MqttSubscriberCommands(MqttSubscriber):
     def __init__(self, session_manager: SessionManager, host: str, port: int = 1883):
         super().__init__(host, MqttSubscriberCommands.topics, port)
         self.__sessionManager = session_manager
+        self.get_client().on_message = self.__on_message
 
     def __on_message(self, client: Client, userdata, msg: MQTTMessage):
-        print(msg.topic + " " + str(msg.payload))
+        print("MqttSubscriberCommands: " + msg.topic + " " + str(msg.payload))
         if msg.topic == MqttSubscriberCommands.topics[0]:
             self.__sessionManager.revert_last()
             print()

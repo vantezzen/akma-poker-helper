@@ -17,4 +17,6 @@ class MqttPublisherState(MqttClient):
         print("MqttPublisherState Connected to Mqtt with result code " + str(rc))
 
     def write_state(self, state: SessionDTO):
-        self.get_client().publish(MqttPublisherState.topic, json.dumps(state))
+        payload = json.dumps(state)
+        print("Write new State: " + payload)
+        self.get_client().publish(MqttPublisherState.topic, payload)
