@@ -9,7 +9,8 @@ from mqtt.MqttSubscriber import MqttSubscriber
 class MqttSubscriberCommands(MqttSubscriber):
     topics = ["akma/poker/command/revertLast",
               "akma/poker/command/startRound",
-              "akma/poker/command/endRound"]
+              "akma/poker/command/endRound",
+              "akma/poker/command/fold"]
 
     def __init__(self, session_manager: SessionManager, host: str, port: int = 1883):
         super().__init__(host, MqttSubscriberCommands.topics, port)
@@ -25,6 +26,8 @@ class MqttSubscriberCommands(MqttSubscriber):
             self.__sessionManager.start_round(json.loads(msg.payload))
             print()
         elif msg.topic == MqttSubscriberCommands.topics[2]:
-            print()
+            pass
+        elif msg.topic == MqttSubscriberCommands.topics[3]:
+            self.__sessionManager.fold_player(json.loads(msg.payload))
         else:
             raise RuntimeError("wrong topic received")

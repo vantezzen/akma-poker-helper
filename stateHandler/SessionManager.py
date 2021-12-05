@@ -10,6 +10,7 @@ class SessionManager:
         self.playerAmount: int = 1
         self.__currentSession: SessionDTO = {
             "desk": [],
+            "foldedPlayers": {},
             "hands": {},
             "nextCard": 0,
             "smallBlind": 1,
@@ -80,6 +81,7 @@ class SessionManager:
         if self.playerAmount != player_amount:
             self.__currentSession: SessionDTO = {
                 "desk": [],
+                "foldedPlayers": {},
                 "hands": {},
                 "nextCard": 1,
                 "smallBlind": 1,
@@ -88,6 +90,7 @@ class SessionManager:
         else:
             self.__currentSession: SessionDTO = {
                 "desk": [],
+                "foldedPlayers": {},
                 "hands": {},
                 "nextCard": 1,
                 "smallBlind": (self.__currentSession["smallBlind"] % self.playerAmount) + 1,
@@ -99,5 +102,9 @@ class SessionManager:
 
         for i in range(1, self.playerAmount + 1):
             self.__currentSession["hands"][str(i)] = []
+            self.__currentSession["foldedPlayers"][str(i)] = False
 
         self.__on_update()
+
+    def fold_player(self, player_id: int):
+        self.__currentSession["foldedPlayers"][str(player_id)] = True
