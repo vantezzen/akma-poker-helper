@@ -20,7 +20,7 @@ const broadcast = (event: string, data: any) => {
   allSockets.forEach(socket => socket.emit(event, data));
 };
 
-const mqtt = MQTT.connect('mqtt://test.mosquitto.org');
+const mqtt = MQTT.connect('mqtt://broker.hivemq.com');
 
 // STOCKET.IO LISTENERS
 io.on('connection', (socket) => {
@@ -83,7 +83,7 @@ mqtt.on("message", function (topic, payload) {
       for (let i = 0; i < game.players.length; i++) {
         game.players[i].emit('state', {
           desk: state.desk || [],
-          hand: state.hand[String(i + 1)] || [],
+          hand: state.hands && state.hands[i + 1] || [],
           nextCard: state.nextCard || "",
         });
       }

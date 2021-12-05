@@ -5,7 +5,7 @@ import { CardData } from './components/Card'
 export type CardStore = {
   desk: CardData[];
   hand: CardData[];
-  nextCard: "desk" | number;
+  nextCard: "" | number;
 }
 
 export type Flag = "big blind" | "small blind";
@@ -63,7 +63,7 @@ const useStore = create<AppStore>((set: Function) => ({
   cards: {
     desk: [],
     hand: [],
-    nextCard: "desk"
+    nextCard: ""
   },
   setCards: (cards: CardStore) => set(() => ({ cards })),
 

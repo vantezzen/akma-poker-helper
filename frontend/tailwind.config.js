@@ -2,7 +2,9 @@ module.exports = {
   purge: {
     content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
     safelist: [
-      'bg-red-500'
+      'bg-red-500',
+      "grid-cols-5",
+      "grid-cols-2",
     ]
   },
   darkMode: false, // or 'media' or 'class'

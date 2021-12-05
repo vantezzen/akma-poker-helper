@@ -24,20 +24,37 @@ function Game() {
   }, [socket]);
 
   return (
-    <div className="w-screen h-screen bg-brand-1 text-brand-2 font-mono grid grid-rows-3">
+    <div className="w-screen h-screen bg-brand-1 text-brand-2 font-mono grid grid-rows-4">
 
-      {/* <CurrentCardsDisplay /> */}
+      <CurrentCardsDisplay />
 
       <HandsInfo />
 
-      <div className="border-t-4 border-solid border-brand-1-dark grid grid-cols-3 gap-1 bg-brand-1-dark z-10">
+      <div className="border-t-4 border-solid border-brand-1-dark grid grid-cols-4 gap-1 bg-brand-1-dark z-10">
       
         <Section>
           <SectionHeading>
             You are
           </SectionHeading>
           <p className="text-3xl font-bold">
-            {logic.name}
+            {cards.nextCard === -1 ? (
+              <span>
+                {logic.isWinner ? 'Winner' : 'Loser haha lol'}
+              </span>
+            ) : (
+              <span>
+                {logic.name}
+              </span>
+            )}
+          </p>
+        </Section>
+
+        <Section>
+          <SectionHeading>
+            Pokerscore ™️©(Patented by Daniel Spannbauer Inc. GmbH Ltd. Ltd.)
+          </SectionHeading>
+          <p className="text-3xl font-bold">
+            {Math.round(logic.pokerScore)}
           </p>
         </Section>
 
@@ -46,7 +63,7 @@ function Game() {
             Next Card
           </SectionHeading>
           <p className="text-3xl font-bold">
-            {cards.nextCard === "desk" ? "On desk" : `Player ${cards.nextCard}`}
+            {cards.nextCard === "" ? "On desk" : cards.nextCard === -1 ? `No next` : `Player ${cards.nextCard}`}
           </p>
         </Section>
 

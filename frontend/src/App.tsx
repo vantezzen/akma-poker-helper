@@ -33,6 +33,17 @@ function App() {
       if (isRunning) {
         setPage(enrolled ? 'game' : 'cantjoin');
       } else {
+        setLogic({
+          ranks: [],
+          pokerScore: 0,
+          isWinner: false,
+          name: ""
+        })
+        setCards({
+          desk: [],
+          hand: [],
+          nextCard: ""
+        })
         setPage(mode ? 'start' : 'modeselect');
       }
     });
