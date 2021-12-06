@@ -8,9 +8,10 @@ import SectionHeading from "./SectionHeading";
 const HandsInfo = () => {
   const cards = useStore(state => state.cards);
   const logic = useStore(state => state.logic);
+  const hasFolded = useStore(state => state.hasFolded);
 
   return (
-    <div className="border-t-4 border-solid border-brand-1-dark bg-brand-1 m-3 rounded row-span-2">
+    <div className="border-t-4 border-solid border-brand-1-dark bg-brand-1 p-3 rounded row-span-2">
         
       <SectionHeading>
         Your top hands
@@ -23,6 +24,12 @@ const HandsInfo = () => {
           </div>
         ))}
       </div>
+
+      {hasFolded && (
+        <div className="absolute flex items-center justify-center top-0 left-0 w-full h-full bg-brand-1-dark bg-opacity-50">
+          You are folded
+        </div>
+      )}
 
     </div>
   );

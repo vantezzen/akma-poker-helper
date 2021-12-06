@@ -76,13 +76,13 @@ function Game() {
         </Section>
 
         <Section>
-          <div className="grid grid-cols-3 gap-4">
-            <Button onClick={() => {
-              socket?.emit('fold')
-              state.setHasFolded(true)
-            }}>
-              Fold
-            </Button>
+          <Button onClick={() => {
+            socket?.emit('fold')
+            state.setHasFolded(true)
+          }}>
+            Fold
+          </Button>
+          <div className="grid grid-cols-2 gap-4 pt-3">
             <Button onClick={() => {
               socket?.emit('revert-card')
             }}>

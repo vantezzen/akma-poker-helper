@@ -1,6 +1,6 @@
 import MQTT from 'async-mqtt';
 
-const mqtt = MQTT.connect('mqtt://test.mosquitto.org');
+const mqtt = MQTT.connect('mqtt://broker.hivemq.com');
 
 const sendTestData = async () => {
 
@@ -41,7 +41,8 @@ const sendTestData = async () => {
           "percentage": 0
         }],
         "pokerScore": 51.9390243902439,
-        "isWinner": false
+        "isWinner": false,
+        "isTied": false
       }, {
         "name": "Player #2",
         "ranks": [{
@@ -76,7 +77,8 @@ const sendTestData = async () => {
           "percentage": 0
         }],
         "pokerScore": 61.95121951219512,
-        "isWinner": false
+        "isWinner": false,
+        "isTied": false
       }, {
         "name": "Player #3",
         "ranks": [{
@@ -111,7 +113,8 @@ const sendTestData = async () => {
           "percentage": 0
         }],
         "pokerScore": 60.073170731707314,
-        "isWinner": false
+        "isWinner": false,
+        "isTied": false
       }, {
         "name": "Player #4",
         "ranks": [{
@@ -146,7 +149,8 @@ const sendTestData = async () => {
           "percentage": 32.5609756097561
         }],
         "pokerScore": 24.134146341463413,
-        "isWinner": false
+        "isWinner": false,
+        "isTied": false
       }]
     }));
     await mqtt.end();
