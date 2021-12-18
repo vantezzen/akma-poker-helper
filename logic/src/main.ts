@@ -87,14 +87,20 @@ function main() {
 
 function fillLogicObject(TableResult: Result) {
   const Ranks = Object.keys(TableResult.getPlayers()[0].getRanks());
+  const FoldedPlayers: boolean[] = Object.values(pokerObject.foldedPlayers);
   TableResult.getPlayers().forEach((player, index) =>
     logicObject.player.push({
-      hasFolded: Object.values(pokerObject.foldedPlayers)[index],
       name: player.getName(),
       ranks: addRanks(TableResult, player.getName(), Ranks),
       pokerScore: addPokerScore(TableResult, player.getName(), Ranks),
-      isWinner: checkForVictory(TableResult, player.getName()),
+      isWinner: checkForVictory(
+        TableResult,
+        player.getName(),
+        FoldedPlayers[index],
+        isLastPlayer(FoldedPlayers, FoldedPlayers[index])
+      ),
       hasTied: checkForTie(TableResult, player.getName()),
+      hasFolded: FoldedPlayers[index],
     })
   );
 }
@@ -170,12 +176,21 @@ function addRanks(result: Result, playerName: string, ranks: string[]): Rank[] {
   return finalRanks;
 }
 
-function checkForVictory(result: Result, playerName: string): boolean {
+function checkForVictory(
+  result: Result,
+  playerName: string,
+  hasFolded: boolean,
+  lastPlayer: boolean
+): boolean {
   let player = result
     .getPlayers()
     .find((player) => player.getName() == playerName);
 
-  return player!.getWinsPercentage() == 100;
+  return (
+    player!.getWinsPercentage() == 100 &&
+    !hasFolded &&
+    (akmaBoard.length == 5 || lastPlayer)
+  );
 }
 
 function checkForTie(result: Result, playerName: string): boolean {
@@ -311,4 +326,9 @@ function bestPossibleHandConsole(result: Result) {
         bestScore
     );
   });
+}
+function isLastPlayer(foldedPlayers: boolean[], hasFolded: boolean): boolean {
+  return (
+    hasFolded && foldedPlayers.filter((value) => value == true).length == 1
+  );
 }
