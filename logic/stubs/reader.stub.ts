@@ -26,6 +26,10 @@ const sendTestData = async () => {
             suit: "diamonds",
             rank: "K",
           },
+          {
+            suit: "clubs",
+            rank: "4",
+          },
         ],
         hands: {
           "1": [
@@ -71,8 +75,8 @@ const sendTestData = async () => {
         },
         foldedPlayers: {
           "1": false,
-          "2": false,
-          "3": true,
+          "2": true,
+          "3": false,
           "4": false,
         },
         nextCard: -1, //-1 keine mehr, 0 desk, 1-16 player

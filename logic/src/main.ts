@@ -60,19 +60,30 @@ mqtt.on("message", function (topic, payload) {
 });
 
 function main() {
-  const Table = new TexasHoldem();
-  Table.setBoard(akmaBoard);
+  const TableWithFolded = new TexasHoldem();
+  const TableWithoutFolded = new TexasHoldem();
+  TableWithFolded.setBoard(akmaBoard);
+  TableWithoutFolded.setBoard(akmaBoard);
   akmaHands.forEach((value) => {
-    Table.addPlayer(value.hand);
+    TableWithFolded.addPlayer(value.hand);
+  });
+  akmaHands.forEach((value) => {
+    if (!value.hasFolded) TableWithoutFolded.addPlayer(value.hand);
   });
 
-  const TableResult = Table.calculate();
+  const TableResultWithFolded = TableWithFolded.calculate();
+  const TableResultWithoutFolded = TableWithoutFolded.calculate();
 
-  if (TableResult.getPlayers().length > 0) {
-    fillLogicObject(TableResult);
-    pokerScoreConsole(TableResult);
-    bestPossibleHandConsole(TableResult);
-    testBoardConsole(TableResult);
+  console.log("TableResultWithFolded:");
+  console.log(TableResultWithFolded);
+  console.log("TableResultWithoutFolded:");
+  console.log(TableResultWithoutFolded);
+
+  if (TableResultWithFolded.getPlayers().length > 0) {
+    fillLogicObject(TableResultWithFolded, TableResultWithoutFolded);
+    pokerScoreConsole(TableResultWithFolded);
+    bestPossibleHandConsole(TableResultWithFolded);
+    testBoardConsole(TableResultWithFolded);
 
     console.log("logicObject:");
     console.log(logicObject);
@@ -85,21 +96,38 @@ function main() {
   }
 }
 
-function fillLogicObject(TableResult: Result) {
-  const Ranks = Object.keys(TableResult.getPlayers()[0].getRanks());
+function fillLogicObject(
+  ResultWithFolded: Result,
+  ResultWithoutFolded: Result
+) {
+  const Ranks = Object.keys(ResultWithFolded.getPlayers()[0].getRanks());
   const FoldedPlayers: boolean[] = Object.values(pokerObject.foldedPlayers);
-  TableResult.getPlayers().forEach((player, index) =>
+
+  let winPercentageOfBestUnfoldedPlayer: number = Math.max.apply(
+    Math,
+    ResultWithoutFolded.getPlayers().map((player) => player.getWinsPercentage())
+  );
+  let handOfWinnerOfUnfoldedPlayer: string = ResultWithoutFolded.getPlayers()
+    .find(
+      (player) =>
+        player.getWinsPercentage() == winPercentageOfBestUnfoldedPlayer
+    )!
+    .getPlayer().getHand()!;
+
+  ResultWithFolded.getPlayers().forEach((player, index) =>
     logicObject.player.push({
       name: player.getName(),
-      ranks: addRanks(TableResult, player.getName(), Ranks),
-      pokerScore: addPokerScore(TableResult, player.getName(), Ranks),
+      ranks: addRanks(ResultWithFolded, player.getName(), Ranks),
+      pokerScore: addPokerScore(ResultWithFolded, player.getName(), Ranks),
       isWinner: checkForVictory(
-        TableResult,
+        ResultWithFolded,
+        ResultWithoutFolded,
         player.getName(),
+        handOfWinnerOfUnfoldedPlayer,
         FoldedPlayers[index],
         isLastPlayer(FoldedPlayers, FoldedPlayers[index])
       ),
-      hasTied: checkForTie(TableResult, player.getName()),
+      hasTied: checkForTie(ResultWithFolded, player.getName()),
       hasFolded: FoldedPlayers[index],
     })
   );
@@ -177,17 +205,19 @@ function addRanks(result: Result, playerName: string, ranks: string[]): Rank[] {
 }
 
 function checkForVictory(
-  result: Result,
+  ResultWithFolded: Result,
+  ResultWithoutFolded: Result,
   playerName: string,
+  handOfWinner: string,
   hasFolded: boolean,
   lastPlayer: boolean
 ): boolean {
-  let player = result
-    .getPlayers()
-    .find((player) => player.getName() == playerName);
+  let player = ResultWithFolded.getPlayers().find(
+    (player) => player.getName() == playerName
+  );
 
   return (
-    player!.getWinsPercentage() == 100 &&
+    player!.getHand() == handOfWinner &&
     !hasFolded &&
     (akmaBoard.length == 5 || lastPlayer)
   );
