@@ -7,6 +7,8 @@ export interface Player {
   ranks: Rank[];
   pokerScore: number;
   isWinner: boolean;
+  hasTied: boolean;
+  hasFolded: boolean;
 }
 
 export interface Rank {

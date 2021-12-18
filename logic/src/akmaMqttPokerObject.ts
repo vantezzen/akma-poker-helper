@@ -1,6 +1,7 @@
 export interface AkmaMqttPokerObject {
   desk: Card[];
   hands: Map<string, Card[]>;
+  foldedPlayers: Map<string, boolean>;
   nextCard: number;
 }
 

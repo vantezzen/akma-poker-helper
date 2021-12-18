@@ -37,16 +37,19 @@ mqtt.on("message", function (topic, payload) {
       // console.log("AKMA Board:");
       // console.log(akmaBoard);
 
-      const player = Object.values(pokerObject.hands);
+      const player: Card[][] = Object.values(pokerObject.hands);
+      const foldedPlayer: boolean[] = Object.values(pokerObject.foldedPlayers);
 
       for (let playerIndex = 0; playerIndex < player.length; playerIndex++) {
         let currentHand = player[playerIndex];
-        if (currentHand != undefined) {
-          setHand(playerIndex, currentHand);
+        let currentFoldedPlayer = foldedPlayer[playerIndex];
+        if (currentHand != undefined && currentFoldedPlayer != undefined) {
+          setHand(playerIndex, currentHand, currentFoldedPlayer);
         }
       }
-      // console.log("AKMA Hands:");
-      // console.log(akmaHands);
+
+      console.log("AKMA Hands:");
+      console.log(akmaHands);
 
       //console.log(`received message: ${topic} ${payload}`)
       main();
@@ -59,7 +62,9 @@ mqtt.on("message", function (topic, payload) {
 function main() {
   const Table = new TexasHoldem();
   Table.setBoard(akmaBoard);
-  akmaHands.forEach((value) => Table.addPlayer(value));
+  akmaHands.forEach((value) => {
+    Table.addPlayer(value.hand);
+  });
 
   const TableResult = Table.calculate();
 
@@ -71,9 +76,9 @@ function main() {
 
     console.log("logicObject:");
     console.log(logicObject);
-    console.log("----------");
-    console.log("JSON.stringify(logicObject):");
-    console.log(JSON.stringify(logicObject, null, 2));
+    // console.log("----------");
+    // console.log("JSON.stringify(logicObject):");
+    // console.log(JSON.stringify(logicObject, null, 2));
 
     sendLogicObject(logicObject);
     logicObject.player = [];
@@ -82,21 +87,30 @@ function main() {
 
 function fillLogicObject(TableResult: Result) {
   const Ranks = Object.keys(TableResult.getPlayers()[0].getRanks());
-  TableResult.getPlayers().forEach((player) =>
+  TableResult.getPlayers().forEach((player, index) =>
     logicObject.player.push({
+      hasFolded: Object.values(pokerObject.foldedPlayers)[index],
       name: player.getName(),
       ranks: addRanks(TableResult, player.getName(), Ranks),
       pokerScore: addPokerScore(TableResult, player.getName(), Ranks),
       isWinner: checkForVictory(TableResult, player.getName()),
+      hasTied: checkForTie(TableResult, player.getName()),
     })
   );
 }
 
-function setHand(playerIndex: number, currentHand: any) {
-  akmaHands.set(playerIndex, [
-    convertMqttCardToAkmaCard(currentHand, 0),
-    convertMqttCardToAkmaCard(currentHand, 1),
-  ]);
+function setHand(
+  playerIndex: number,
+  currentHand: Card[],
+  currentFoldedPlayer: boolean
+) {
+  akmaHands.set(playerIndex, {
+    hand: [
+      convertMqttCardToAkmaCard(currentHand, 0),
+      convertMqttCardToAkmaCard(currentHand, 1),
+    ],
+    hasFolded: currentFoldedPlayer,
+  });
 }
 
 function convertMqttCardToAkmaCard(card: Card[], index: number): any {
@@ -162,6 +176,14 @@ function checkForVictory(result: Result, playerName: string): boolean {
     .find((player) => player.getName() == playerName);
 
   return player!.getWinsPercentage() == 100;
+}
+
+function checkForTie(result: Result, playerName: string): boolean {
+  let player = result
+    .getPlayers()
+    .find((player) => player.getName() == playerName);
+
+  return player!.getTiesPercentage() == 100;
 }
 
 async function sendLogicObject(logicObjectToSend: AkmaLogicObject) {
