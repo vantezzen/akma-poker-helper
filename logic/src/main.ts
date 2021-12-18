@@ -4,6 +4,7 @@ import { MqttPayloadConverter } from "./MqttPayloadConverter";
 import { AkmaMqttPokerObject, Card } from "./AkmaMqttPokerObject";
 import { AkmaLogicObject, Rank } from "./AkmaLogicObject";
 import Result from "poker-odds-calc/dts/lib/Result";
+import Player from "poker-odds-calc/dts/lib/Player";
 
 console.log("AKMA starting...");
 const mqttAdress: string = "mqtt://broker.hivemq.com";
@@ -103,16 +104,21 @@ function fillLogicObject(
   const Ranks = Object.keys(ResultWithFolded.getPlayers()[0].getRanks());
   const FoldedPlayers: boolean[] = Object.values(pokerObject.foldedPlayers);
 
-  let winPercentageOfBestUnfoldedPlayer: number = Math.max.apply(
-    Math,
-    ResultWithoutFolded.getPlayers().map((player) => player.getWinsPercentage())
+  let handOfWinningUnfoldedPlayer: string = "";
+  let thereIsAWinner = ResultWithoutFolded.getPlayers().some(
+    (player) => player.getWinsPercentage() == 100
   );
-  let handOfWinnerOfUnfoldedPlayer: string = ResultWithoutFolded.getPlayers()
-    .find(
-      (player) =>
-        player.getWinsPercentage() == winPercentageOfBestUnfoldedPlayer
-    )!
-    .getPlayer().getHand()!;
+  if (thereIsAWinner) {
+    handOfWinningUnfoldedPlayer = ResultWithoutFolded.getPlayers()
+      .find((player) => player.getWinsPercentage() == 100)!
+      .getPlayer()
+      .getHand()!;
+  }
+
+  let handsOfTiedUnfoldedPlayer: string[] = [];
+  ResultWithoutFolded.getPlayers()
+    .filter((player) => player.getTiesPercentage() == 100)
+    .map((player) => handsOfTiedUnfoldedPlayer.push(player.getHand()!));
 
   ResultWithFolded.getPlayers().forEach((player, index) =>
     logicObject.player.push({
@@ -121,13 +127,17 @@ function fillLogicObject(
       pokerScore: addPokerScore(ResultWithFolded, player.getName(), Ranks),
       isWinner: checkForVictory(
         ResultWithFolded,
-        ResultWithoutFolded,
         player.getName(),
-        handOfWinnerOfUnfoldedPlayer,
+        handOfWinningUnfoldedPlayer,
         FoldedPlayers[index],
         isLastPlayer(FoldedPlayers, FoldedPlayers[index])
       ),
-      hasTied: checkForTie(ResultWithFolded, player.getName()),
+      hasTied: checkForTie(
+        ResultWithFolded,
+        player.getName(),
+        handsOfTiedUnfoldedPlayer,
+        FoldedPlayers[index]
+      ),
       hasFolded: FoldedPlayers[index],
     })
   );
@@ -206,7 +216,6 @@ function addRanks(result: Result, playerName: string, ranks: string[]): Rank[] {
 
 function checkForVictory(
   ResultWithFolded: Result,
-  ResultWithoutFolded: Result,
   playerName: string,
   handOfWinner: string,
   hasFolded: boolean,
@@ -223,12 +232,21 @@ function checkForVictory(
   );
 }
 
-function checkForTie(result: Result, playerName: string): boolean {
+function checkForTie(
+  result: Result,
+  playerName: string,
+  handOfTied: string[],
+  hasFolded: boolean
+): boolean {
   let player = result
     .getPlayers()
     .find((player) => player.getName() == playerName);
 
-  return player!.getTiesPercentage() == 100;
+  return (
+    handOfTied.some((currentplayer) => currentplayer == player!.getHand()) &&
+    !hasFolded &&
+    akmaBoard.length == 5
+  );
 }
 
 async function sendLogicObject(logicObjectToSend: AkmaLogicObject) {

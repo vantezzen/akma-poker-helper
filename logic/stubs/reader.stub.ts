@@ -39,7 +39,7 @@ const sendTestData = async () => {
             },
             {
               suit: "clubs",
-              rank: "A",
+              rank: "8",
             },
           ],
           "2": [
@@ -54,11 +54,11 @@ const sendTestData = async () => {
           ],
           "3": [
             {
-              suit: "diamonds",
-              rank: "7",
+              suit: "clubs",
+              rank: "A",
             },
             {
-              suit: "diamonds",
+              suit: "spades",
               rank: "8",
             },
           ],
@@ -69,7 +69,7 @@ const sendTestData = async () => {
             },
             {
               suit: "clubs",
-              rank: "10",
+              rank: "7",
             },
           ],
         },
