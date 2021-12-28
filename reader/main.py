@@ -16,7 +16,7 @@ def card_publisher():
 def card_reader():
     reader = RFID(bus=3)
     print("Start waiting for cards")
-    helper = ReadHelper(MqttPublisherCard(mqttHost))
+    helper = ReadHelper(mqttPublisherCard)
     try:
         while True:
             reader.wait_for_tag()
