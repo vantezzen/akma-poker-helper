@@ -6,6 +6,7 @@ export type CardStore = {
   desk: CardData[];
   hand: CardData[];
   nextCard: "" | number;
+  status: "" | "Small Blind" | "Big Blind";
 }
 
 export type Flag = "big blind" | "small blind";
@@ -16,7 +17,7 @@ export type Gamelogic = {
   }[],
   pokerScore: number;
   isWinner: boolean;
-  isTied: boolean;
+  hasTied: boolean;
   name: string;
 }
 
@@ -76,7 +77,8 @@ const useStore = create<AppStore>((set: Function) => ({
   cards: {
     desk: [],
     hand: [],
-    nextCard: ""
+    nextCard: "",
+    status: ""
   },
   setCards: (cards: CardStore) => set(() => ({ cards })),
 
@@ -85,7 +87,7 @@ const useStore = create<AppStore>((set: Function) => ({
     ranks: [],
     pokerScore: 0,
     isWinner: false,
-    isTied: false,
+    hasTied: false,
     name: ""
   },
   setLogic: (logic: Gamelogic) => set(() => ({ logic })),

@@ -84,6 +84,11 @@ function Start() {
 
       <div className="flex flex-col items-center mt-4">
         {action}
+        <Button color="red-500" className="mt-5" onClick={() => {
+          socket?.emit('reset');
+        }}>
+          Reset game
+        </Button>
       </div>
     </div>
   );

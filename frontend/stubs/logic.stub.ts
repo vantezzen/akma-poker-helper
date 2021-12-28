@@ -42,7 +42,7 @@ const sendTestData = async () => {
         }],
         "pokerScore": 51.9390243902439,
         "isWinner": false,
-        "isTied": false
+        "hasTied": false
       }, {
         "name": "Player #2",
         "ranks": [{
@@ -78,7 +78,7 @@ const sendTestData = async () => {
         }],
         "pokerScore": 61.95121951219512,
         "isWinner": false,
-        "isTied": false
+        "hasTied": false
       }, {
         "name": "Player #3",
         "ranks": [{
@@ -114,7 +114,7 @@ const sendTestData = async () => {
         }],
         "pokerScore": 60.073170731707314,
         "isWinner": false,
-        "isTied": false
+        "hasTied": false
       }, {
         "name": "Player #4",
         "ranks": [{
@@ -150,7 +150,7 @@ const sendTestData = async () => {
         }],
         "pokerScore": 24.134146341463413,
         "isWinner": false,
-        "isTied": false
+        "hasTied": false
       }]
     }));
     await mqtt.end();

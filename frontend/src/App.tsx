@@ -23,7 +23,7 @@ function App() {
   const setHasFolded = useStore(state => state.setHasFolded);
 
   useEffect(() => {
-    const socket = io();
+    const socket = io(':3001');
     setSocket(socket);
     socket.on('players', (players) => {
       console.log('Socket: Got player count', players);
@@ -39,13 +39,14 @@ function App() {
           ranks: [],
           pokerScore: 0,
           isWinner: false,
-          isTied: false,
+          hasTied: false,
           name: ""
         })
         setCards({
           desk: [],
           hand: [],
-          nextCard: ""
+          nextCard: "",
+          status: "",
         })
         setHasFolded(false);
         setPage(mode ? 'start' : 'modeselect');
@@ -58,6 +59,9 @@ function App() {
     socket.on('logic', (logic) => {
       console.log('Socket: Got logic', logic);
       setLogic(logic);
+    });
+    socket.on('reload', () => {
+      window.location.reload();
     });
     socket.on('playerNum', (num) => {
       setPlayerNumber(num);

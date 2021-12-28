@@ -28,7 +28,7 @@ function Game() {
   if (cards.nextCard === -1) {
     if (logic.isWinner) {
       currentState = "Winner";
-    } else if (logic.isTied) {
+    } else if (logic.hasTied) {
       currentState = "Tied";
     } else {
       currentState = "Loser";
@@ -54,6 +54,7 @@ function Game() {
           </SectionHeading>
           <p className="text-3xl font-bold">
             {currentState}
+            {state.cards.status && <div className="text-brand-2 text-base"> ({state.cards.status})</div>}
           </p>
         </Section>
 
@@ -76,24 +77,44 @@ function Game() {
         </Section>
 
         <Section>
-          <Button onClick={() => {
-            socket?.emit('fold')
-            state.setHasFolded(true)
-          }}>
-            Fold
-          </Button>
-          <div className="grid grid-cols-2 gap-4 pt-3">
-            <Button onClick={() => {
-              socket?.emit('revert-card')
-            }}>
-              Revert card {glassMode && ' (tap)'}
-            </Button>
-            <Button color="red-500" onClick={() => {
-              socket?.emit('stop')
-            }}>
-              Stop game {glassMode && ' (double tap)'}
-            </Button>
-          </div>
+          {state.cards.nextCard == -1 ? (
+            <div className="grid grid-cols-2 gap-4 pt-3">
+              <Button onClick={() => {
+                socket?.emit('stop')
+                socket?.emit('start')
+              }}>
+                Start new round
+              </Button>
+              <Button color="red-500" onClick={() => {
+                socket?.emit('stop')
+              }}>
+                Stop game {glassMode && ' (double tap)'}
+              </Button>
+            </div>
+          ) : (
+            <>
+              {!state.hasFolded && (
+                <Button onClick={() => {
+                  socket?.emit('fold')
+                  state.setHasFolded(true)
+                }}>
+                  Fold
+                </Button>
+              )}
+              <div className="grid grid-cols-2 gap-4 pt-3">
+                <Button onClick={() => {
+                  socket?.emit('revert-card')
+                }}>
+                  Revert card {glassMode && ' (tap)'}
+                </Button>
+                <Button color="red-500" onClick={() => {
+                  socket?.emit('stop')
+                }}>
+                  Stop game {glassMode && ' (double tap)'}
+                </Button>
+              </div>
+            </>
+          )}
         </Section>
 
       </div>
