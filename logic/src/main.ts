@@ -65,13 +65,17 @@ function main() {
   const TableWithoutFolded = new TexasHoldem();
   TableWithFolded.setBoard(akmaBoard);
   TableWithoutFolded.setBoard(akmaBoard);
+
   akmaHands.forEach((value) => {
     TableWithFolded.addPlayer(value.hand);
   });
+  let playerStillInGame:number = 0;
   akmaHands.forEach((value) => {
-    if (!value.hasFolded) TableWithoutFolded.addPlayer(value.hand);
+    if (!value.hasFolded) {TableWithoutFolded.addPlayer(value.hand)
+      playerStillInGame++;
+    };
   });
-
+  //TODO Fix only one player isnta WIN
   const TableResultWithFolded = TableWithFolded.calculate();
   const TableResultWithoutFolded = TableWithoutFolded.calculate();
 
@@ -80,7 +84,7 @@ function main() {
   console.log("TableResultWithoutFolded:");
   console.log(TableResultWithoutFolded);
 
-  if (TableResultWithFolded.getPlayers().length > 0) {
+  if (TableResultWithFolded.getPlayers().length > 1) {
     fillLogicObject(TableResultWithFolded, TableResultWithoutFolded);
     pokerScoreConsole(TableResultWithFolded);
     bestPossibleHandConsole(TableResultWithFolded);
