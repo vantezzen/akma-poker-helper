@@ -69,39 +69,51 @@ function main() {
   akmaHands.forEach((value) => {
     TableWithFolded.addPlayer(value.hand);
   });
-  let playerStillInGame:number = 0;
+  let playerStillInGame: number = 0;
   akmaHands.forEach((value) => {
-    if (!value.hasFolded) {TableWithoutFolded.addPlayer(value.hand)
+    if (!value.hasFolded) {
+      TableWithoutFolded.addPlayer(value.hand);
       playerStillInGame++;
-    };
+    }
   });
-  //TODO Fix only one player isnta WIN
   const TableResultWithFolded = TableWithFolded.calculate();
-  const TableResultWithoutFolded = TableWithoutFolded.calculate();
-
   console.log("TableResultWithFolded:");
   console.log(TableResultWithFolded);
-  console.log("TableResultWithoutFolded:");
-  console.log(TableResultWithoutFolded);
 
-  if (TableResultWithFolded.getPlayers().length > 1) {
-    fillLogicObject(TableResultWithFolded, TableResultWithoutFolded);
-    pokerScoreConsole(TableResultWithFolded);
-    bestPossibleHandConsole(TableResultWithFolded);
-    testBoardConsole(TableResultWithFolded);
+  let TableResultWithoutFolded: Result;
 
-    console.log("logicObject:");
-    console.log(logicObject);
-    // console.log("----------");
-    // console.log("JSON.stringify(logicObject):");
-    // console.log(JSON.stringify(logicObject, null, 2));
+  if (playerStillInGame != 0) {
+    if (playerStillInGame >= 2) {
+      console.log("----- More than 2 Player still in Game -----");
 
-    sendLogicObject(logicObject);
-    logicObject.player = [];
+      TableResultWithoutFolded = TableWithoutFolded.calculate();
+      console.log("TableResultWithoutFolded:");
+      console.log(TableResultWithoutFolded);
+
+      fillLogicObjectNormal(TableResultWithFolded, TableResultWithoutFolded);
+    } else {
+      console.log("----- Only 1 Player left -----");
+
+      fillLogicOnlyOnePlayerLeft(TableResultWithFolded, TableWithoutFolded);
+    }
   }
+  //START TESTS
+  // pokerScoreConsole(TableResultWithFolded);
+  // bestPossibleHandConsole(TableResultWithFolded);
+  // testBoardConsole(TableResultWithFolded);
+  //END TESTS
+
+  console.log("logicObject:");
+  console.log(logicObject);
+  // console.log("----------");
+  // console.log("JSON.stringify(logicObject):");
+  // console.log(JSON.stringify(logicObject, null, 2));
+
+  sendLogicObject(logicObject);
+  logicObject.player = [];
 }
 
-function fillLogicObject(
+function fillLogicObjectNormal(
   ResultWithFolded: Result,
   ResultWithoutFolded: Result
 ) {
@@ -142,6 +154,35 @@ function fillLogicObject(
         handsOfTiedUnfoldedPlayer,
         FoldedPlayers[index]
       ),
+      hasFolded: FoldedPlayers[index],
+    })
+  );
+}
+
+function fillLogicOnlyOnePlayerLeft(
+  ResultWithFolded: Result,
+  TableWithoutFolded: TexasHoldem
+) {
+  const Ranks = Object.keys(ResultWithFolded.getPlayers()[0].getRanks());
+  const FoldedPlayers: boolean[] = Object.values(pokerObject.foldedPlayers);
+
+  let handOfWinningUnfoldedPlayer: string = "";
+  handOfWinningUnfoldedPlayer =
+    TableWithoutFolded.getPlayersInHand()[0].getHand()!;
+
+  ResultWithFolded.getPlayers().forEach((player, index) =>
+    logicObject.player.push({
+      name: player.getName(),
+      ranks: addRanks(ResultWithFolded, player.getName(), Ranks),
+      pokerScore: addPokerScore(ResultWithFolded, player.getName(), Ranks),
+      isWinner: checkForVictory(
+        ResultWithFolded,
+        player.getName(),
+        handOfWinningUnfoldedPlayer,
+        FoldedPlayers[index],
+        isLastPlayer(FoldedPlayers, FoldedPlayers[index])
+      ),
+      hasTied: false,
       hasFolded: FoldedPlayers[index],
     })
   );
@@ -375,12 +416,12 @@ function bestPossibleHandConsole(result: Result) {
         ' the best possible Rank ist: "' +
         bestRankName +
         '" and the best Possible Score is: ' +
-        bestScore
+        bestScore 
     );
   });
 }
 function isLastPlayer(foldedPlayers: boolean[], hasFolded: boolean): boolean {
   return (
-    hasFolded && foldedPlayers.filter((value) => value == true).length == 1
+    !hasFolded && foldedPlayers.filter((value) => value == false).length == 1
   );
 }
