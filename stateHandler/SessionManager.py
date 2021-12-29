@@ -106,3 +106,5 @@ class SessionManager:
 
     def fold_player(self, player_id: int):
         self.__currentSession["foldedPlayers"][str(player_id)] = True
+
+        self.__on_update()
