@@ -4,7 +4,6 @@ import { MqttPayloadConverter } from "./MqttPayloadConverter";
 import { AkmaMqttPokerObject, Card } from "./AkmaMqttPokerObject";
 import { AkmaLogicObject, Rank } from "./AkmaLogicObject";
 import Result from "poker-odds-calc/dts/lib/Result";
-import Player from "poker-odds-calc/dts/lib/Player";
 
 console.log("Starting AKMA...");
 const mqttAdress: string = "mqtt://broker.hivemq.com";
