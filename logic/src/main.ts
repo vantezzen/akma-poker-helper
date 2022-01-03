@@ -6,8 +6,9 @@ import { AkmaLogicObject, Rank } from "./AkmaLogicObject";
 import Result from "poker-odds-calc/dts/lib/Result";
 import Player from "poker-odds-calc/dts/lib/Player";
 
-console.log("AKMA starting...");
+console.log("Starting AKMA...");
 const mqttAdress: string = "mqtt://broker.hivemq.com";
+const mqttChannel: string = "akma/poker/state";
 
 const mqtt = MQTT.connect(mqttAdress);
 const payloadConverter = new MqttPayloadConverter();
@@ -17,26 +18,19 @@ let logicObject: AkmaLogicObject = { player: [] };
 let akmaBoard: Array<string> = [];
 const akmaHands = new Map();
 
-mqtt.subscribe("akma/poker/state");
-console.log("subscribed to MQTT");
+mqtt.subscribe(mqttChannel);
+console.log('subscribed to MQTT on channel "' + mqttChannel + '"');
 
 mqtt.on("message", function (topic, payload) {
-  if (topic == "akma/poker/state") {
+  if (topic == mqttChannel) {
     pokerObject = JSON.parse(payload.toString());
 
-    // console.log("PokerObj: ");
-    // console.log(pokerObj);
-    // console.log("");
-    // console.log("PokerObj.stringify(): ");
-    // console.log(JSON.stringify(pokerObj, null, 2));
     if (pokerObject.desk.length >= 3 && pokerObject.desk.length <= 5) {
       logicObject.player = [];
       akmaBoard = [];
       for (let index = 0; index < pokerObject.desk.length; index++) {
         akmaBoard[index] = convertMqttCardToAkmaCard(pokerObject.desk, index);
       }
-      // console.log("AKMA Board:");
-      // console.log(akmaBoard);
 
       const player: Card[][] = Object.values(pokerObject.hands);
       const foldedPlayer: boolean[] = Object.values(pokerObject.foldedPlayers);
@@ -48,11 +42,6 @@ mqtt.on("message", function (topic, payload) {
           setHand(playerIndex, currentHand, currentFoldedPlayer);
         }
       }
-
-      console.log("AKMA Hands:");
-      console.log(akmaHands);
-
-      //console.log(`received message: ${topic} ${payload}`)
       main();
     } else {
       console.log("Wrong number of Boardcards!");
@@ -77,39 +66,21 @@ function main() {
     }
   });
   const TableResultWithFolded = TableWithFolded.calculate();
-  console.log("TableResultWithFolded:");
-  console.log(TableResultWithFolded);
-
   let TableResultWithoutFolded: Result;
 
   if (playerStillInGame != 0) {
     if (playerStillInGame >= 2) {
-      console.log("----- More than 2 Player still in Game -----");
-
       TableResultWithoutFolded = TableWithoutFolded.calculate();
-      console.log("TableResultWithoutFolded:");
-      console.log(TableResultWithoutFolded);
-
       fillLogicObjectNormal(TableResultWithFolded, TableResultWithoutFolded);
     } else {
-      console.log("----- Only 1 Player left -----");
-
       fillLogicOnlyOnePlayerLeft(TableResultWithFolded, TableWithoutFolded);
     }
   }
-  //START TESTS
-  // pokerScoreConsole(TableResultWithFolded);
-  // bestPossibleHandConsole(TableResultWithFolded);
-  // testBoardConsole(TableResultWithFolded);
-  //END TESTS
-
-  console.log("logicObject:");
-  console.log(logicObject);
-  // console.log("----------");
-  // console.log("JSON.stringify(logicObject):");
-  // console.log(JSON.stringify(logicObject, null, 2));
 
   sendLogicObject(logicObject);
+  // Debugging
+  // console.log("succecfully send logicObject:");
+  // console.log(JSON.stringify(logicObject, null, 2));
   logicObject.player = [];
 }
 
@@ -203,9 +174,6 @@ function setHand(
 }
 
 function convertMqttCardToAkmaCard(card: Card[], index: number): any {
-  console.log("card");
-  console.log(card[index]);
-
   return payloadConverter.convertMqttCardToAkma(
     card[index].suit,
     card[index].rank
@@ -239,12 +207,9 @@ function addRanks(result: Result, playerName: string, ranks: string[]): Rank[] {
   let player = result
     .getPlayers()
     .find((player) => player.getName() == playerName);
-  let players = result.getPlayers();
   let iterations = result.getIterations();
   let currentRank = 0;
-  let bestRank = 1;
   let percentage = 0;
-  let bestRankName = "Fail";
   let finalRanks: Rank[] = [];
 
   ranks.forEach((rank) => {
@@ -306,120 +271,6 @@ async function sendLogicObject(logicObjectToSend: AkmaLogicObject) {
   }
 }
 
-function testBoardConsole(result: Result) {
-  let players = result.getPlayers();
-  let ranks = Object.keys(players[0].getRanks());
-  // console.log(`Board: ${Result.getBoard()}`);
-
-  ranks.forEach((rank) => {
-    //let str = players[0].getRanks()[rank].getName();
-    let str = "";
-    players.forEach((player) => {
-      if (player.getRanks()[rank].getCount() > 0)
-        str +=
-          "   " +
-          player.getRanks()[rank].getCount() +
-          " (" +
-          player.getRanks()[rank].getPercentage(true) +
-          ")";
-      else str += " - ";
-    });
-    console.log(str);
-  });
-
-  result.getPlayers().forEach((player) => {
-    console.log(
-      `${player.getName()} - ${player.getHand()} - Wins: ${player.getWinsPercentageString()} - Ties: ${player.getTiesPercentageString()}`
-    );
-  });
-
-  console.log(`Iterations: ${result.getIterations()}`);
-  console.log(`Time takes: ${result.getTime()}ms`);
-
-  // Outputs:
-  // Player #1 - QsKs - Wins: 20.45% - Ties: 79.55%
-  // Player #2 - QdKd - Wins: 0.00% - Ties: 79.55%
-  // Board: JsTs5hTd
-  // Iterations: 44
-  // Time takes: 8ms
-}
-
-function pokerScoreConsole(result: Result) {
-  let players = result.getPlayers();
-  let ranks = Object.keys(players[0].getRanks());
-  let iterations = result.getIterations();
-  let currentRank = 42;
-  let totalScore = 0;
-  let partialScore = 0;
-  let percentage = 0;
-
-  console.log("Total Iterations: " + iterations);
-  console.log("Ranks:");
-  players.forEach((player) => {
-    console.log(`${player.getName()}: `), (totalScore = 0), (currentRank = 0);
-    ranks.forEach((rank) => {
-      (percentage = player.getRanks()[rank].getCount() / iterations),
-        (partialScore = (10 - currentRank) * percentage * 10),
-        console.log(
-          `Rank: ${10 - currentRank} - ${player
-            .getRanks()
-            [rank].getName()} - %: ${player
-            .getRanks()
-            [rank].getCount()}/${iterations} = ${Math.round(
-            percentage * 100
-          )} - Score: ${Math.round(partialScore)}`
-        );
-      totalScore += partialScore;
-      currentRank++;
-    });
-    console.log(
-      "TotalScore for " + player.getName() + ": " + Math.round(totalScore)
-    );
-  });
-}
-
-function bestPossibleHandConsole(result: Result) {
-  let players = result.getPlayers();
-  let ranks = Object.keys(players[0].getRanks());
-  let iterations = result.getIterations();
-  let currentRank = 42;
-  let bestRank = 1;
-  let bestScore = 10;
-  let percentage = 0;
-  let bestRankName = "Fail";
-
-  console.log("");
-  players.forEach((player) => {
-    console.log(`${player.getName()}: `),
-      (currentRank = 0),
-      (bestRank = 1),
-      (bestScore = 10);
-    ranks.forEach((rank) => {
-      if (player.getRanks()[rank].getCount() != 0) {
-        (percentage = player.getRanks()[rank].getCount() / iterations),
-          console.log(
-            `PokerScore: ${(10 - currentRank) * 10} - ${player
-              .getRanks()
-              [rank].getName()} - ${(percentage * 100).toPrecision(4)}%`
-          );
-        if (bestRank < 10 - currentRank) {
-          bestRankName = player.getRanks()[rank].getName();
-          bestRank = 10 - currentRank;
-          bestScore = bestRank * 10;
-        }
-      }
-      currentRank++;
-    });
-    console.log(
-      "For " +
-        player.getName() +
-        ' the best possible Rank ist: "' +
-        bestRankName +
-        '" and the best Possible Score is: ' +
-        bestScore 
-    );
-  });
-}
 function isLastPlayer(foldedPlayers: boolean[], hasFolded: boolean): boolean {
   return (
     !hasFolded && foldedPlayers.filter((value) => value == false).length == 1
