@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { LogOut, RotateCcw, Square } from 'react-feather';
 import Button from '../components/Button';
 import CurrentCardsDisplay from '../components/CurrentCardsDisplay';
 import GlassTapListener from '../components/GlassTapListener';
@@ -65,6 +66,7 @@ function Game() {
           <p className="text-3xl font-bold">
             {Math.round(logic.pokerScore)}
           </p>
+          <div style={{ width: `${logic.pokerScore}%` }} className='h-6 bg-brand-2 rounded duration-200' />
         </Section>
 
         <Section>
@@ -98,19 +100,19 @@ function Game() {
                   socket?.emit('fold')
                   state.setHasFolded(true)
                 }}>
-                  Fold
+                  <LogOut /> Fold
                 </Button>
               )}
               <div className="grid grid-cols-2 gap-4 pt-3">
                 <Button onClick={() => {
                   socket?.emit('revert-card')
                 }}>
-                  Revert card {glassMode && ' (tap)'}
+                  <RotateCcw /> Revert card {glassMode && ' (tap)'}
                 </Button>
                 <Button color="red-500" onClick={() => {
                   socket?.emit('stop')
                 }}>
-                  Stop game {glassMode && ' (double tap)'}
+                   <Square /> Stop game {glassMode && ' (double tap)'}
                 </Button>
               </div>
             </>

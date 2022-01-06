@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { LogIn, LogOut, Play, RotateCcw } from 'react-feather';
 import Button from '../components/Button';
 import CurrentCardsDisplay from '../components/CurrentCardsDisplay';
 import GlassTapListener from '../components/GlassTapListener';
@@ -47,7 +48,7 @@ function Start() {
     <Button onClick={() => {
       joinGame();
     }}>
-      Register as next player in the round {glassMode && ' (tap)'}
+      <LogIn /> Register as next player in the round {glassMode && ' (tap)'}
     </Button>
   )
   if (isEnrolled) {
@@ -60,12 +61,12 @@ function Start() {
         <Button onClick={() => {
           startGame();
         }}>
-          Start the round {glassMode && ' (tap)'}
+          <Play /> Start the round {glassMode && ' (tap)'}
         </Button>
         <Button color="red-500" className="mt-5" onClick={() => {
           leaveGame();
         }}>
-          Leave round {glassMode && ' (double tap)'}
+          <LogOut /> Leave round {glassMode && ' (double tap)'}
         </Button>
       </>
     )
@@ -87,7 +88,7 @@ function Start() {
         <Button color="red-500" className="mt-5" onClick={() => {
           socket?.emit('reset');
         }}>
-          Reset game
+          <RotateCcw /> Reset game
         </Button>
       </div>
     </div>

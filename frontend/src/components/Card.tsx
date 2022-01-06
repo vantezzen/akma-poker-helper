@@ -18,7 +18,7 @@ const Card = ({ suit, rank, className } : { suit?: CardSuit, rank?: CardRank, cl
   const suitLower = suit?.toLowerCase();
   return (
     <div 
-      className={`h-full rounded text-brand-1 flex items-center justify-center text-xl font-black py-4 ` + (suit && rank ? " bg-brand-2 ": " bg-brand-1-dark ") + className}
+      className={`h-full rounded text-brand-1 flex items-center justify-center text-xl font-black py-4 ` + (suit && rank ? " bg-brand-2 animate__animated animate__flipInY ": " bg-brand-1-dark ") + className}
     >
       {suit && rank ? (
         <>

@@ -23,7 +23,7 @@ function App() {
   const setHasFolded = useStore(state => state.setHasFolded);
 
   useEffect(() => {
-    const socket = io(':3001');
+    const socket = io();
     setSocket(socket);
     socket.on('players', (players) => {
       console.log('Socket: Got player count', players);
