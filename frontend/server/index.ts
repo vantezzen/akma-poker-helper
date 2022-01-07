@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-const game = new Game();
+let game = new Game();
 
 app.use(cors());
 
@@ -59,6 +59,13 @@ io.on('connection', (socket) => {
     console.log('folding player');
     mqtt.publish('akma/poker/command/fold', (game.players.findIndex(player => player === socket) + 1).toString());
   });
+  socket.on('reset', () => {
+    console.log('resetting game');
+    
+    mqtt.publish('akma/poker/command/endRound', "");
+    game = new Game();
+    broadcast('reload', '');
+  });
 
   socket.emit('players', game.players.length);
   socket.emit('isRunning', game.isRunning);
@@ -86,10 +93,18 @@ mqtt.on("message", function (topic, payload) {
       console.log('Got state', state);
 
       for (let i = 0; i < game.players.length; i++) {
+        let status = "";
+        if (state.smallBlind === (i + 1)) {
+          status = "Small Blind";
+        } else if (state.bigBlind === (i + 1)) {
+          status = "Big Blind";
+        }
+
         game.players[i].emit('state', {
           desk: state.desk || [],
           hand: state.hands && state.hands[i + 1] || [],
           nextCard: state.nextCard || "",
+          status,
         });
       }
     } else if (topic.endsWith('/logic')) {
