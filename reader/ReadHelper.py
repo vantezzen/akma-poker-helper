@@ -32,7 +32,7 @@ class ReadHelper:
                 print("auth failed!")
             self.processing_finished_or_failed(uid)
 
-    def processing_finished_or_failed(self, uid: List[int]):
+    def processing_finished_or_failed(self, uid: List[int]) -> None:
         self.processed_cards.append(str(uid))
 
     def auth_a(self, reader, uid) -> bool:
@@ -40,3 +40,6 @@ class ReadHelper:
 
     def auth_b(self, reader, uid) -> bool:
         return not reader.card_auth(reader.auth_b, 11, [0x33, 0xEA, 0x50, 0x57, 0x20, 0x23], uid)
+
+    def clear_cards(self) -> None:
+        self.processed_cards.clear()

@@ -3,6 +3,8 @@ from typing import List
 
 from pirc522 import RFID
 
+from Card import Card
+
 
 class WriteHelper:
     def __init__(self):
@@ -16,11 +18,11 @@ class WriteHelper:
 
     def get_suit_name(self) -> str:
         real_index = self.writeQueue[self.currentWriteQueueIndex][1]
-        return ["hearts", "diamonds", "spades", "clubs"][real_index]
+        return Card.allowed_suits[real_index]
 
     def get_rank_name(self) -> str:
         real_index = self.writeQueue[self.currentWriteQueueIndex][3]
-        return ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"][real_index]
+        return Card.allowed_ranks[real_index]
 
     def get_next_write_card(self) -> List[int]:
         self.currentWriteQueueIndex += 1

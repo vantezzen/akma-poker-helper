@@ -17,4 +17,5 @@ class MqttPublisherCard(MqttClient):
         print("MqttPublisherState Connected to Mqtt with result code " + str(rc))
 
     def write_card(self, card: Card):
+        print("Send Data: { suit:" + card.suit + ", rank:" + card.rank + " }")
         self.get_client().publish(MqttPublisherCard.topic, json.dumps(card.__dict__))
