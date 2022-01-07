@@ -1,0 +1,24 @@
+{
+  "name": "logic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/main.ts",
+    "stub:reader": "ts-node stubs/reader.stub.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async-mqtt": "^2.6.1",
+    "bidirectional-map": "^1.1.1",
+    "poker-odds-calc": "^0.0.14",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/bidirectional-map": "^1.0.1",
+    "nodemon": "^2.0.15"
+  }
+}
